@@ -12,6 +12,7 @@ Render for CNN is released under the MIT License (refer to the LICENSE file for 
 
 ### Citing JointEmbedding
 If you find JointEmbedding useful in your research, please consider citing:
+
     @inproceedings{su2015render4cnn,
         Title={Render for CNN: Viewpoint Estimation in Images Using CNNs Trained with Rendered 3D Model Views},
         Author={Su, Hao and Qi, Charles R. and Li, Yangyan and Guibas, Leonidas J. },
