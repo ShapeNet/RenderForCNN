@@ -32,4 +32,4 @@ if __name__ == '__main__':
         shape_list = load_one_category_shape_list(synset)
         view_params = load_one_category_shape_views(synset)
         render_one_category_model_views(shape_list, view_params)
-
+        exit()

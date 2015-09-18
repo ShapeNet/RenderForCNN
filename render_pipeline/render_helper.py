@@ -26,7 +26,7 @@ from global_variables import *
 '''
 def load_one_category_shape_list(shape_synset):
     # return a list of (synset, md5, numofviews) tuples
-    shape_md5_list = os.listdir(os.path.join(g_shapenet_root_folder,shape_synset)
+    shape_md5_list = os.listdir(os.path.join(g_shapenet_root_folder,shape_synset))
     view_num = g_syn_images_num_per_category / len(shape_md5_list)
     shape_list = [(shape_synset, shape_md5, os.path.join(g_shapenet_root_folder, shape_synset, shape_md5, 'model.obj'), view_num) for shape_md5 in shape_md5_list]
     return shape_list
@@ -59,22 +59,26 @@ def render_one_category_model_views(shape_list, view_params):
     if not os.path.exists(tmp_dirname):
         os.mkdir(tmp_dirname)
 
-    print('Generating rendering commands...', end = '')
+    print('Generating rendering commands...')
+    commands = []
     for shape_synset, shape_md5, shape_file, view_num in shape_list:
         # write tmp view file
         tmp = tempfile.NamedTemporaryFile(dir=tmp_dirname, delete=False)
         for i in range(view_num): 
             paramId = random.randint(0, len(view_params)-1)
             tmp_string = '%f %f %f %f\n' % (view_params[paramId][0], view_params[paramId][1], view_params[paramId][2], max(0.01,view_params[paramId][3]))
-            tmp.write(bytes(tmp_string, 'UTF-8'))
+            tmp.write(tmp_string)
         tmp.close()
 
         command = '%s %s --background --python %s -- %s %s %s %s %s > /dev/null 2>&1' % (g_blender_executable_path, g_blank_blend_file_path, os.path.join(BASE_DIR, 'render_model_views.py'), shape_file, shape_synset, shape_md5, tmp.name, os.path.join(g_syn_images_folder, shape_synset, shape_md5))
         commands.append(command)
     print('done (%d commands)!'%(len(commands)))
+    print commands[0]
 
     print('Rendering, it takes long time...')
     report_step = 100
+    if not os.path.exists(os.path.join(g_syn_images_folder, shape_synset)):
+        os.mkdir(os.path.join(g_syn_images_folder, shape_synset))
     pool = Pool(g_syn_rendering_thread_num)
     for idx, return_code in enumerate(pool.imap(partial(call, shell=True), commands)):
         if idx % report_step == 0:

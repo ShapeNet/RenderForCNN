@@ -138,6 +138,8 @@ shape_synset = sys.argv[-4]
 shape_md5 = sys.argv[-3]
 shape_view_params_file = sys.argv[-2]
 syn_images_folder = sys.argv[-1]
+if not os.path.exists(syn_images_folder):
+    os.mkdir(syn_images_folder)
 #syn_images_folder = os.path.join(g_syn_images_folder, shape_synset, shape_md5) 
 view_params = [[float(x) for x in line.strip().split(' ')] for line in open(shape_view_params_file).readlines()]
 
@@ -169,7 +171,7 @@ bpy.ops.object.delete()
 for param in view_params:
     azimuth_deg = param[0]
     elevation_deg = param[1]
-    theta_deg = param[2]
+    theta_deg = -1 * param[2] # ** multiply by -1 to match pascal3d annotations **
     rho = param[3]
 
     # clear default lights

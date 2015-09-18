@@ -1,0 +1,7 @@
+*.pyc
+*.m~
+*.mat
+*.caffemodel
+*.solverstate
+global_variables.m
+data/*

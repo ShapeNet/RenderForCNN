@@ -10,7 +10,7 @@ Our work was initially described in an [arXiv tech report](http://arxiv.org/abs/
 Render for CNN is released under the MIT License (refer to the LICENSE file for details).
 
 
-### Citing JointEmbedding
+### Citing Render for CNN
 If you find JointEmbedding useful in your research, please consider citing:
 
     @inproceedings{su2015render4cnn,
