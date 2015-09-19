@@ -36,6 +36,13 @@ g_blank_blend_file_path = os.path.join(g_render4cnn_root_folder, 'render_pipelin
 g_syn_images_num_per_category = 200000
 g_syn_rendering_thread_num = 20
 
+g_hostname_synset_idx_map = {'oriong.stanford.edu': [0,1],
+                             'orionp.stanford.edu': [2,3],
+                             'orionp2.stanford.edu':[4,5],
+                             'orions2.stanford.edu':[6,7],
+                             'orions3.stanford.edu':[8,9],
+                             'orions4.stanford.edu':[10,11]}
+
 # view and truncation distribution estimation
 g_matlab_kde_folder = '/orions-zfs/software/matlab-package/kde'
 g_view_statistics_folder = os.path.join(g_data_folder, 'view_statistics')

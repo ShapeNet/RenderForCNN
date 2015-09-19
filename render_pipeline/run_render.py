@@ -15,6 +15,7 @@ import datetime
 from functools import partial
 from multiprocessing.dummy import Pool
 from subprocess import call
+import socket
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
@@ -26,8 +27,8 @@ if __name__ == '__main__':
     if not os.path.exists(g_syn_images_folder):
         os.mkdir(g_syn_images_folder) 
     
-    # TODO: distribute rendering to several servers
-    for idx, synset in enumerate(g_shape_synsets):
+    for idx in g_hostname_synset_idx_map[socket.gethostname()]:
+        synset = g_shape_synsets[idx]
         print('%d: %s, %s\n' % (idx, synset, g_shape_names[idx]))
         shape_list = load_one_category_shape_list(synset)
         view_params = load_one_category_shape_views(synset)
