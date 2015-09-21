@@ -8,13 +8,6 @@ RENDER_ALL_SHAPES
 
 import os
 import sys
-import shutil
-import random
-import tempfile
-import datetime
-from functools import partial
-from multiprocessing.dummy import Pool
-from subprocess import call
 import socket
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -33,4 +26,3 @@ if __name__ == '__main__':
         shape_list = load_one_category_shape_list(synset)
         view_params = load_one_category_shape_views(synset)
         render_one_category_model_views(shape_list, view_params)
-        exit()

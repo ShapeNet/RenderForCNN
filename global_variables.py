@@ -11,7 +11,7 @@ g_data_folder = os.path.abspath(os.path.join(g_render4cnn_root_folder, 'data'))
 g_datasets_folder = os.path.abspath(os.path.join(g_render4cnn_root_folder, 'datasets'))
 g_shapenet_root_folder = os.path.join(g_datasets_folder, 'shapenetcore')
 g_pascal3d_root_folder = os.path.join(g_datasets_folder, 'pascal3d')
-g_sun2012pascalformat_root_folder = os.path.join(g_datasets_folder, 'sun2012pascalformat')
+g_sun2012pascalformat_root_folder = os.path.join(g_datasets_folder, 'sun12pascalformat')
 
 # ------------------------------------------------------------
 # RENDER FOR CNN PIPELINE
@@ -31,17 +31,26 @@ g_shape_synset_name_pairs = [('02691156', 'aeroplane'),
 g_shape_synsets = [x[0] for x in g_shape_synset_name_pairs]
 g_shape_names = [x[1] for x in g_shape_synset_name_pairs]
 g_syn_images_folder = os.path.join(g_data_folder, 'syn_images')
+g_syn_images_cropped_folder = os.path.join(g_data_folder, 'syn_images_cropped')
+g_syn_images_bkg_overlaid_folder = os.path.join(g_data_folder, 'syn_images_cropped_bkg_overlaid')
+g_syn_bkg_filelist = os.path.join(g_sun2012pascalformat_root_folder, 'filelist.txt')
+g_syn_bkg_folder = os.path.join(g_sun2012pascalformat_root_folder, 'JPEGImages')
+g_syn_cluttered_bkg_ratio = 0.8
 g_blender_executable_path = '/orions-zfs/software/blender-2.71/blender'
+g_matlab_executable_path = '/orions3-zfs/software/matlab2014b/bin/matlab'
 g_blank_blend_file_path = os.path.join(g_render4cnn_root_folder, 'render_pipeline/blank.blend') 
 g_syn_images_num_per_category = 200000
 g_syn_rendering_thread_num = 20
 
+# Skip orions3 since model is store on orions3
 g_hostname_synset_idx_map = {'oriong.stanford.edu': [0,1],
-                             'orionp.stanford.edu': [2,3],
-                             'orionp2.stanford.edu':[4,5],
-                             'orions2.stanford.edu':[6,7],
-                             'orions3.stanford.edu':[8,9],
+                             'orionp.stanford.edu': [2,3,4],
+                             'orionp2.stanford.edu': [5,6,7],
+                             'orions2.stanford.edu':[8,9], 
                              'orions4.stanford.edu':[10,11]}
+# Crop and overlay is IO-heavy, running on local FS is much faster
+g_crop_hostname_synset_idx_map = {'orions4.stanford.edu': range(12)}
+g_overlay_hostname_synset_idx_map = {'orions4.stanford.edu': range(12)}
 
 # view and truncation distribution estimation
 g_matlab_kde_folder = '/orions-zfs/software/matlab-package/kde'
@@ -57,3 +66,12 @@ g_syn_light_num_lowbound = 0
 g_syn_light_num_highbound = 6
 g_syn_light_dist_lowbound = 8
 g_syn_light_dist_highbound = 20
+
+
+
+# ------------------------------------------------------------
+# VIEW_ESTIMATION
+# ------------------------------------------------------------
+g_syn_images_lmdb_folder = os.path.join(g_data_folder, 'syn_lmdbs')
+g_syn_images_lmdb_pathname_prefix = os.path.join(g_syn_images_lmdb_folder, 'syn_lmdb_')
+g_syn_images_resize_dim = 227

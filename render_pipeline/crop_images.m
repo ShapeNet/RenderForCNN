@@ -1,21 +1,25 @@
-function batch_crop(src_folder, dst_folder, jitter, src_image_list)
+function crop_images(src_folder, dst_folder, truncation_distr_file)
+
+image_files = rdir(fullfile(src_folder,'*/*.png'));
+image_num = length(image_files);
+fprintf('%d images in total.\n', image_num);
+truncationParameters = importdata(truncation_distr_file);
+truncationParametersSub = truncationParameters(randi([1,length(truncationParameters)],1,image_num),:);
 
 fprintf('Start croping at time %s...it takes for a while!!\n', datestr(now, 'HH:MM:SS'));
 report_num = 80;
 fprintf([repmat('.',1,report_num) '\n\n']);
-image_num = length(src_image_list);
 report_step = floor((image_num+report_num-1)/report_num);
 t_begin = clock;
-%for i = 1:length(src_image_list)
 parfor i = 1:image_num
-    src_image_file = src_image_list{i};
+    src_image_file = image_files(i).name;
     try
         [I, ~, alpha] = imread(src_image_file);       
     catch
         fprintf('Failed to read %s\n', src_image_file);
     end
 
-    [alpha, top, bottom, left, right] = crop_gray(alpha, 0, jitter);      
+    [alpha, top, bottom, left, right] = crop_gray(alpha, 0, truncationParametersSub(i,:));
     I = I(top:bottom, left:right, :);
 
     if numel(I) == 0
