@@ -26,19 +26,19 @@ if __name__ == '__main__':
     # prepare voc12val det bbox (from rcnn) images
     matlab_cmd = "addpath('%s'); prepare_voc12val_det_imgs('%s','%s', 0);" % (BASE_DIR, g_real_images_voc12val_det_bbox_folder, g_rcnn_detection_bbox_mat_filelist)
     print matlab_cmd
-    os.system('%s -nodisplay -r "try %s ; catch; end; quit;"' % (g_matlab_executable_path, matlab_cmd))
+    #os.system('%s -nodisplay -r "try %s ; catch; end; quit;"' % (g_matlab_executable_path, matlab_cmd))
    
 
     # prepare voc12val gt bbox easy (no trunction/occlusion) images
     matlab_cmd = "addpath('%s'); prepare_voc12_imgs('val','%s',struct('flip',0,'aug_n',1,'jitter_IoU',1,'difficult',0,'truncated',0,'occluded',0));" % (BASE_DIR, g_real_images_voc12val_easy_gt_bbox_folder)
     print matlab_cmd
-    os.system('%s -nodisplay -r "try %s ; catch; end; quit;"' % (g_matlab_executable_path, matlab_cmd))
+    #os.system('%s -nodisplay -r "try %s ; catch; end; quit;"' % (g_matlab_executable_path, matlab_cmd))
    
 
     # prepare voc12train gt bbox images and its LMDB
     matlab_cmd = "addpath('%s'); prepare_voc12_imgs('train','%s',struct('flip',%d,'aug_n',%d,'jitter_IoU',%d,'difficult',1,'truncated',1,'occluded',1));" % (BASE_DIR, g_real_images_voc12train_all_gt_bbox_folder, g_real_images_voc12train_flip, g_real_images_voc12train_aug_n, g_real_images_voc12train_jitter_IoU)
     print matlab_cmd
-    os.system('%s -nodisplay -r "try %s ; catch; end; quit;"' % (g_matlab_executable_path, matlab_cmd))
+    #os.system('%s -nodisplay -r "try %s ; catch; end; quit;"' % (g_matlab_executable_path, matlab_cmd))
 
     if not os.path.exists(g_real_images_lmdb_folder):
         os.mkdir(g_real_images_lmdb_folder)

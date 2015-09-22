@@ -90,4 +90,10 @@ g_real_images_voc12train_all_gt_bbox_lmdb_prefix = os.path.join(g_real_images_lm
 g_detection_results_folder = os.path.join(g_data_folder, 'detection_results')
 g_rcnn_detection_bbox_mat_filelist = os.path.join(g_detection_results_folder, 'bbox_mat_filelist.txt')
 
+# training
 g_rcnn_caffe_model = '/orions3-zfs/projects/haosu/Image2Scene/data/pretrained_models/rcnn.caffemodel'
+
+# testing
+g_caffe_param_file = '/ShapeNetDL/projects/ViewEstimation/src/train/finetune_render_rcnn/snapshots_iter_70000.caffemodel'
+g_test_prototxt_template_file = os.path.join(g_render4cnn_root_folder, 'view_estimation', 'template_test.prototxt')
+g_test_prototxt_batch_size = 64

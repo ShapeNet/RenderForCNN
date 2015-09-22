@@ -28,4 +28,4 @@ if __name__ == '__main__':
         #combine_files(input_file_list, output_file)
         
         # generate LMDB
-        generate_image_view_lmdb(output_file, '%s_%s' % (g_syn_images_lmdb_pathname_prefix, keyword), g_syn_images_resize_dim)
+        generate_image_view_lmdb(output_file, '%s_%s' % (g_syn_images_lmdb_pathname_prefix, keyword))

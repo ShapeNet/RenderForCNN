@@ -104,7 +104,7 @@ def view2label(degree, class_index):
     write TWO LMDB corresponding to images and labels, 
     i.e. xxx/xxxx_lmdb_label (each item is class_idx, azimuth, elevation, tilt) and xxx/xxxx_lmdb_image
 '''
-def generate_image_view_lmdb(image_label_file, output_lmdb, image_resize_dim):
+def generate_image_view_lmdb(image_label_file, output_lmdb):
     lines = [line.rstrip() for line in open(image_label_file,'r')]
 
     tmp_label_fout = tempfile.NamedTemporaryFile(dir=g_syn_images_lmdb_folder, delete=False)
@@ -119,7 +119,7 @@ def generate_image_view_lmdb(image_label_file, output_lmdb, image_resize_dim):
         write_vector_lmdb(tmp_label_fout.name, output_lmdb+'_label')
     print "Label DB done ..."
     if not os.path.exists(output_lmdb+'_image'):
-        write_image_lmdb(image_label_file, output_lmdb+'_image', image_resize_dim)  
+        write_image_lmdb(image_label_file, output_lmdb+'_image')  
     print "Image DB done ..."
     
     # clean up

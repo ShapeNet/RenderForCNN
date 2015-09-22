@@ -1,26 +1,31 @@
 import caffe
 import lmdb
+import os
+import sys
 import numpy as np
 import argparse
 from PIL import Image
 from multiprocessing import Pool
 import datetime
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(BASE_DIR)
+sys.path.append(os.path.dirname(BASE_DIR))
+from global_variables import *
+
 '''
 @brief:
     get serialized datum of image-label pair, used solely for caffe
 @input:
     img_label - (img_filename, label)
-    resize_dim (D) - resize image to DxD, if resize_dim is 0, no resize.
 @output:
     serialized datum of resized,colored,channel-swapped,transposed image
 '''
-def imglabel2datum(img_label, resize_dim=0):
+def imglabel2datum(img_label):
     imname, label = img_label
     im = Image.open(imname)
     # resize
-    if resize_dim > 0:
-      im = im.resize((resize_dim, resize_dim), Image.ANTIALIAS)
+    im = im.resize((g_images_resize_dim, g_images_resize_dim), Image.ANTIALIAS)
     # convert to array
     im = np.array(im)
     # convert gray to color
@@ -41,13 +46,12 @@ def imglabel2datum(img_label, resize_dim=0):
 @input:
     image_file - txt file each line of which is image filename
     output_lmdb - lmdb pathname
-    image_resize_dim (D) - resize images to DxD
 @output:
     generate image LMDB (label is just idx of image in the image_file)
     labels should be separately prepared
     note: lmdb key is idx number (e.g. 0000000021) of image in image_file
 '''
-def write_image_lmdb(image_file, output_lmdb, image_resize_dim):
+def write_image_lmdb(image_file, output_lmdb):
     img_filenames = [line.rstrip().split(' ')[0] for line in open(image_file, 'r')]
     N = len(img_filenames)
     
