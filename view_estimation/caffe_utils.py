@@ -1,12 +1,17 @@
 import caffe
+from caffe.proto import caffe_pb2
 import lmdb
 import os
 import sys
+import math
 import numpy as np
 import argparse
 from PIL import Image
 from multiprocessing import Pool
 import datetime
+from google.protobuf import text_format
+import scipy.ndimage
+import skimage.transform
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
@@ -123,4 +128,56 @@ def load_vector_from_lmdb(dbname, feat_dim, max_num=float('Inf')):
     in_db.close()
     return feats
 
+
+def batch_predict(gpu_index, BATCH_SIZE,  model_deploy_file, model_params_file, result_keys, img_files, mean_file, resize_dim = 0): 
+    # set imagenet_mean
+    #imagenet_mean = np.array([104,117,123])
+    imagenet_mean = np.load(mean_file)
+    net_parameter = caffe_pb2.NetParameter()
+    text_format.Merge(open(model_deploy_file, 'r').read(), net_parameter)
+    print net_parameter
+    print net_parameter.input_dim, imagenet_mean.shape
+    ratio = 227*1.0/imagenet_mean.shape[1]
+    imagenet_mean = scipy.ndimage.zoom(imagenet_mean, (1, ratio, ratio))
+    
+    # INIT NETWORK - NEW CAFFE VERSION
+    net = caffe.Net(model_deploy_file, model_params_file, caffe.TEST)
+    transformer = caffe.io.Transformer({'data': net.blobs['data'].data.shape})
+    transformer.set_transpose('data', (2,0,1)) # height*width*channel -> channel*height*width
+    transformer.set_mean('data', imagenet_mean) #### subtract mean ####
+    transformer.set_raw_scale('data', 255) # pixel value range
+    transformer.set_channel_swap('data', (2,1,0)) # RGB -> BGR
+
+    # set test batch size
+    data_blob_shape = net.blobs['data'].data.shape
+    data_blob_shape = list(data_blob_shape)
+    net.blobs['data'].reshape(BATCH_SIZE, data_blob_shape[1], data_blob_shape[2], data_blob_shape[3])
+
+    ## BATCH PREDICTS
+    batch_num = int(math.ceil(len(img_files)/float(BATCH_SIZE)))
+    probs_lists = [[] for _ in range(len(result_keys))]
+    for k in range(batch_num):
+        start_idx = BATCH_SIZE * k
+        end_idx = min(BATCH_SIZE * (k+1), len(img_files))
+        print 'batch: %d/%d, idx: %d to %d' % (k, batch_num, start_idx, end_idx)
+    
+        # prepare batch input data
+        input_data = []
+        for j in range(start_idx, end_idx):
+            im = caffe.io.load_image(img_files[j])
+            if resize_dim > 0: im = skimage.transform.resize(im, (resize_dim, resize_dim))
+            input_data.append(im)
+        for j in range(BATCH_SIZE - len(input_data)):
+            input_data.append(im)
+        inputs = input_data
+
+        # foward pass!
+        net.blobs['data'].data[...] = map(lambda x: transformer.preprocess('data', x), input_data)
+        out = net.forward()
+    
+        for i,key in enumerate(result_keys):
+            probs = out[result_keys[i]]
+            for j in range(end_idx-start_idx):
+                probs_lists[i].append(np.array(np.squeeze(probs[j,:])))
+    return probs_lists
 

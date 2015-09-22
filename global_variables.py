@@ -95,5 +95,8 @@ g_rcnn_caffe_model = '/orions3-zfs/projects/haosu/Image2Scene/data/pretrained_mo
 
 # testing
 g_caffe_param_file = '/ShapeNetDL/projects/ViewEstimation/src/train/finetune_render_rcnn/snapshots_iter_70000.caffemodel'
-g_test_prototxt_template_file = os.path.join(g_render4cnn_root_folder, 'view_estimation', 'template_test.prototxt')
-g_test_prototxt_batch_size = 64
+g_caffe_deploy_file = '/orions4-zfs/projects/rqi/Code/render4cnn/view_estimation/view_estimation_deploy.prototxt'
+g_caffe_prob_keys = ['fc-azimuth','fc-elevation','fc-tilt']
+g_image_mean_file = '/orions3-zfs/projects/rqi/Data/deploy/imagenet_mean.npy'
+#g_test_prototxt_template_file = os.path.join(g_render4cnn_root_folder, 'view_estimation', 'template_test.prototxt')
+#g_test_prototxt_batch_size = 64

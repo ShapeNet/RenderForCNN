@@ -11,48 +11,53 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.dirname(BASE_DIR))
 from global_variables import *
-#from caffe_utils import *
+from caffe_utils import *
 
-def viewpoint(img_name_file, class_idx, output_result_file):
-    N = len(open(img_name_file).readlines())
-    print N, math.ceil(N/float(g_test_prototxt_batch_size))
-
-    tmp_azimuth = os.path.join(BASE_DIR, 'tmp_azimuth_lmdb')
-    tmp_elevation = os.path.join(BASE_DIR, 'tmp_elevation_lmdb')
-    tmp_tilt = os.path.join(BASE_DIR, 'tmp_tilt_lmdb')
-    tmp_prototxt_file = os.path.join(BASE_DIR, 'tmp_prototxt_file')
-    with open(tmp_prototxt_file, 'w') as fout:
-        with open(g_test_prototxt_template_file, 'r') as fin:
-            for line in fin:
-                fout.write(line.replace('PARAM_IMAGE_LIST_FILE', img_name_file).replace(
-                    'PARAM_BATCH_SIZE',str(g_test_prototxt_batch_size)))
-    exit()
-    # use extract_feature to extract to lmdbs
-    try:
-        print('Going to extract probs...')
-        extract_feature_cmd = 'extract_features %s %s fc-azimuth,fc-elevation,fc-tilt %s,%s,%s %d lmdb GPU' % (g_caffe_param_file, tmp_prototxt_file, tmp_azimuth, tmp_elevation, tmp_tilt, int(math.ceil(N/float(g_test_prototxt_batch_size))))
-        print extract_feature_cmd
-        os.system(extract_feature_cmd)
-
-        # get probs of azimuth,elevation,tilt of each image, Nx4320
-        prob_dim = 4320
-        fc_azimuth=load_vector_from_lmdb(tmp_azimuth, prob_dim, N)
-        fc_elevation=load_vector_from_lmdb(tmp_elevation, prob_dim, N)
-        fc_tilt=load_vector_from_lmdb(tmp_tilt, prob_dim, N)
-        
-        # use class_name/class_idx to get predictions, Nx1
-        pred_azimuth=[argmax(fc_azimuth[k,class_idx*360:(class_idx+1)*360]) for k in range(N)]
-        pred_elevation=[argmax(fc_elevation[k,class_idx*360:(class_idx+1)*360]) for k in range(N)]
-        pred_tilt=[argmax(fc_tilt[k,class_idx*360:(class_idx+1)*360]) for k in range(N)] 
-
-        fout = open(output_result_file, 'w')
-        for k in range(N):
-            fout.write('%d %d %d\n' % (pred_azimuth[k], pred_elevation[k], pred_tilt[k]))
-        fout.close()
-    except:
-        pass
-
-    os.system('rm -r %s %s %s %s' % (tmp_azimuth, tmp_elevation, tmp_tilt, tmp_prototxt_file))
+def viewpoint(img_name_class_file, output_result_file):
+    gpu_index = 0
+    batch_size = 64
+    model_params_file = g_caffe_param_file
+    model_deploy_file = g_caffe_deploy_file
+    result_keys = g_caffe_prob_keys
+    resize_dim = g_images_resize_dim
+    image_mean_file = g_image_mean_file
+    file_lines = open(img_name_class_file, 'r').readlines()
+    img_filenames = [x.rstrip().split(' ')[0] for x in file_lines]
+    class_idxs = [int(x.rstrip().split(' ')[1]) for x in file_lines]
+    
+    # ** NETWORK FORWARD PASS **
+    probs_lists = batch_predict(gpu_index, batch_size, model_deploy_file, model_params_file, result_keys, img_filenames, image_mean_file, resize_dim)
+    
+    # EXTRACT PRED FROM PROBS
+    preds = []
+    for k in range(len(result_keys)):
+        preds.append([])
+    for i in range(len(img_filenames)):
+        class_idx = class_idxs[i]
+        # pred is the class with highest prob within
+        # class_idx*360~class_idx*360+360-1
+        # specific to PASCAL3D !!
+        #for k in range(3):
+        for k in range(len(result_keys)):
+            probs = probs_lists[k][i]
+            probs = probs[class_idx*360:(class_idx+1)*360]
+            pred = probs.argmax() + class_idx*360
+            preds[k].append(pred)
+    
+    # OUTPUT: apred epred tpred
+    fout = open(output_result_file, 'w')
+    for i in range(len(img_filenames)):
+        fout.write('%d %d %d\n' % (preds[0][i] % 360, preds[1][i] % 360, preds[2][i] % 360))
+    fout.close()
+    
+    
+    # OUTPUT: log file
+    log_output_filename = output_result_file+'.log'
+    fout = open(log_output_filename, 'w')
+    fout.write("img_name_class_file: %s\noutput_result_file: %s\nresize_dim: %d\n" % (img_name_class_file, output_result_file, resize_dim))
+    fout.write('model_deploy_file_3dview: %s\n' % (model_deploy_file))
+    fout.write('model_params_file_3dview: %s\n' % (model_params_file))
+    fout.close()
 
 
 # localization + viewpoint estimation
