@@ -91,3 +91,32 @@ def write_vector_lmdb(input_txt_file, output_lmdb):
             datum = caffe.io.array_to_datum(datum, in_idx)
             in_txn.put('{:0>10d}'.format(in_idx), datum.SerializeToString())
     in_db.close()
+
+
+'''
+@brief:
+    Load vectors from LMDB, return the vectors as NxD numpy array
+'''
+def load_vector_from_lmdb(dbname, feat_dim, max_num=float('Inf')):
+    in_db = lmdb.open(dbname, map_size=int(1e12))
+    print dbname, in_db.stat()
+
+    N = min(in_db.stat()['entries'], max_num) 
+    feats = np.zeros((N,int(feat_dim)))
+    
+    with in_db.begin(write=False) as in_txn:
+        for k in range(N):
+            print k
+            keyname = '%010d' % k
+            a = in_txn.get(keyname)
+            datum = caffe_pb2.Datum()
+            datum.ParseFromString(a)
+            array =  caffe.io.datum_to_array(datum)
+            #print array, np.shape(array)
+            array = np.squeeze(array)
+            assert(array is not None)
+            feats[k,:] = array
+    in_db.close()
+    return feats
+
+

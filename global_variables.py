@@ -73,5 +73,21 @@ g_syn_light_dist_highbound = 20
 # VIEW_ESTIMATION
 # ------------------------------------------------------------
 g_syn_images_lmdb_folder = os.path.join(g_data_folder, 'syn_lmdbs')
-g_syn_images_lmdb_pathname_prefix = os.path.join(g_syn_images_lmdb_folder, 'syn_lmdb_')
+g_syn_images_lmdb_pathname_prefix = '/ShapeNetDL/projects/render4cnn/syn_lmdb' #os.path.join(g_syn_images_lmdb_folder, 'syn_lmdb')
 g_syn_images_resize_dim = 227
+g_images_resize_dim = 227
+
+g_real_images_folder = os.path.join(g_data_folder, 'real_images')
+g_real_images_voc12val_det_bbox_folder = os.path.join(g_real_images_folder, 'voc12val_det_bbox')
+g_real_images_voc12val_easy_gt_bbox_folder = os.path.join(g_real_images_folder, 'voc12val_easy_gt_bbox')
+g_real_images_voc12train_all_gt_bbox_folder = os.path.join(g_real_images_folder, 'voc12train_all_gt_bbox')
+g_real_images_voc12train_flip = 1
+g_real_images_voc12train_aug_n = 1
+g_real_images_voc12train_jitter_IoU = 1
+g_real_images_lmdb_folder = os.path.join(g_data_folder, 'real_lmdbs')
+g_real_images_voc12train_all_gt_bbox_lmdb_prefix = os.path.join(g_real_images_lmdb_folder, 'voc12train_all_gt_bbox_lmdb')
+
+g_detection_results_folder = os.path.join(g_data_folder, 'detection_results')
+g_rcnn_detection_bbox_mat_filelist = os.path.join(g_detection_results_folder, 'bbox_mat_filelist.txt')
+
+g_rcnn_caffe_model = '/orions3-zfs/projects/haosu/Image2Scene/data/pretrained_models/rcnn.caffemodel'

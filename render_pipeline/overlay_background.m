@@ -52,6 +52,7 @@ parfor i = 1:image_num
         fprintf('Failed to overlay %s (empty image after crop)\n', src_image_file);
     else
         dst_image_file = strrep(src_image_file, src_folder, dst_folder);
+        dst_image_file = strrep(dst_image_file, '.png', '.jpg');
         [dst_image_file_folder, ~, ~] = fileparts(dst_image_file);
         if ~exist(dst_image_file_folder, 'dir')
             mkdir(dst_image_file_folder);

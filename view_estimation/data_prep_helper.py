@@ -40,16 +40,20 @@ def path2label(path):
 def get_one_category_image_label_file(shape_synset, train_image_label_file, test_image_label_file, train_ratio = 0.9):
     class_idx = g_shape_synsets.index(shape_synset) 
 
-    image_folder = os.path.join(g_syn_images_cropped_bkg_overlaid_folder, shape_synset)
+    image_folder = os.path.join(g_syn_images_bkg_overlaid_folder, shape_synset)
     all_md5s = os.listdir(image_folder)
-    train_test_split = int(len(md5s)*train_ratio)
-    train_md5s = md5s[0:train_test_split]
-    test_md5s = md5s[train_test_split:]
+    train_test_split = int(len(all_md5s)*train_ratio)
+    train_md5s = all_md5s[0:train_test_split]
+    test_md5s = all_md5s[train_test_split:]
 
     for md5s_list, image_label_file in [(train_md5s, train_image_label_file), (test_md5s, test_image_label_file)]:
         image_filenames = []
-        for md5 in md5s_list:
-            image_filenames += os.listdir(os.path.join(image_folder, md5))
+        for k,md5 in enumerate(md5s_list):
+            if k%(1+len(md5s_list)/20)==0:
+                print('shape: %s clsidx: %d, %d/%d: %s' % (shape_synset, class_idx, k,len(md5s_list),md5))
+            shape_folder = os.path.join(image_folder, md5)
+            shape_images = [os.path.join(shape_folder, x) for x in os.listdir(shape_folder)]
+            image_filenames += shape_images
         image_filename_label_pairs = [(fpath,path2label(fpath)) for fpath in image_filenames]
         random.shuffle(image_filename_label_pairs)
 
@@ -67,7 +71,7 @@ def get_one_category_image_label_file(shape_synset, train_image_label_file, test
     input_file_list - a list of input file names
     output_file - output filename
 '''
-def combine_file(input_file_list, output_file, shuffle=1):
+def combine_files(input_file_list, output_file, shuffle=1):
     all_lines = []
     for filelist in input_file_list:
         lines = [x.rstrip() for x in open(filelist,'r')]
@@ -98,23 +102,25 @@ def view2label(degree, class_index):
     image_resize_dim (D): resize image to DxD square
 @output:
     write TWO LMDB corresponding to images and labels, 
-    i.e. xxx/xxxx_lmdb_label and xxx/xxxx_lmdb_image
+    i.e. xxx/xxxx_lmdb_label (each item is class_idx, azimuth, elevation, tilt) and xxx/xxxx_lmdb_image
 '''
 def generate_image_view_lmdb(image_label_file, output_lmdb, image_resize_dim):
-    tmp_label_file = tempfile.NamedTemporaryFile(dir=g_syn_images_lmdb_folder, delete=False)
     lines = [line.rstrip() for line in open(image_label_file,'r')]
-    fout = open(tmp_label_file, 'w')
+
+    tmp_label_fout = tempfile.NamedTemporaryFile(dir=g_syn_images_lmdb_folder, delete=False)
     for line in lines:
         ll = line.split(' ')
         class_idx, azimuth, elevation, tilt = [int(x) for x in ll[1:]]
-        fout.write('%d %d %d\n' % (view2label(azimuth, class_idx), view2label(elevation, class_idx), view2label(tilt, class_idx)))
-    fout.close()
-    print("Tmp label file generated: %s" % tmp_label_file)
+        tmp_label_fout.write('%d %d %d %d\n' % (class_idx, view2label(azimuth, class_idx), view2label(elevation, class_idx), view2label(tilt, class_idx)))
+    tmp_label_fout.close()
+    print("Tmp label file generated: %s" % tmp_label_fout.name)
     
-    write_vector_lmdb(tmp_label_file, output_lmdb+'_label')
+    if not os.path.exists(output_lmdb+'_label'):
+        write_vector_lmdb(tmp_label_fout.name, output_lmdb+'_label')
     print "Label DB done ..."
-    write_image_lmdb(image_label_file, output_lmdb+'_image', image_resize_dim)  
+    if not os.path.exists(output_lmdb+'_image'):
+        write_image_lmdb(image_label_file, output_lmdb+'_image', image_resize_dim)  
     print "Image DB done ..."
     
     # clean up
-    os.system('rm %s' % (tmp_labels_filename))
+    os.system('rm %s' % (tmp_label_fout.name))
