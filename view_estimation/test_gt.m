@@ -1,6 +1,8 @@
-function test_gt(prediction_folder, view_label_folder)
+function test_gt(prediction_folder, view_label_folder, write_result)
 % prediction_folder contains <classname>_pred_view.txt
 % view_label_folder contains <classname>.txt
+% write_result - if set to 1, write result to acc_mederr_results.txt in prediction_folder
+
 addpath(fullfile(mfilename('fullpath'), '../../'));
 global_variables;
 
@@ -21,3 +23,25 @@ display(acc);
 display(mederr);
 fprintf('Mean acc = %f\n', mean(acc));
 fprintf('Mean mederr = %f\n (in degree)\n', mean(mederr)/pi*180);
+
+if nargin < 3
+    write_result = 1;
+end
+if write_result
+    fid = fopen(fullfile(prediction_folder, 'acc_mederr_results.txt'), 'w');
+    for k = 1:N
+        fprintf(fid, sprintf('%s ', g_cls_names{k}));
+    end
+    fprintf(fid, '\n');
+    for k = 1:N
+        fprintf(fid, sprintf('%f ', acc(k)));
+    end
+    fprintf(fid, '\n');
+    for k = 1:N
+        fprintf(fid, sprintf('%f ', mederr(k)));
+    end
+    fprintf(fid, '\n');
+    fprintf(fid, 'Mean acc = %f\n', mean(acc));
+    fprintf(fid, 'Mean mederr = %f\n (in degree)\n', mean(mederr)/pi*180);
+    fclose(fid);
+end

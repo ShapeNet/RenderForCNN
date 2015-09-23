@@ -29,7 +29,7 @@ from global_variables import *
 def imglabel2datum(img_label):
     imname, label = img_label
     im = Image.open(imname)
-    # resize
+    #  ** resize **
     im = im.resize((g_images_resize_dim, g_images_resize_dim), Image.ANTIALIAS)
     # convert to array
     im = np.array(im)
