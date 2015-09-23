@@ -15,7 +15,7 @@ from caffe_utils import *
 
 '''
 @brief:
-    predict 3d viewpoint of object, output prediction results
+    predict 3d viewpoint of object, output prediction results (compatible with NEW caffe interface - 2015 Aug)
 @input:
     img_filenames - list of image filenames
     class_idxs - list of class index (0~11)
@@ -31,7 +31,6 @@ def viewpoint(img_filenames, class_idxs, output_result_file):
     result_keys = g_caffe_prob_keys
     resize_dim = g_images_resize_dim
     image_mean_file = g_image_mean_file
-    file_lines = open(img_name_class_file, 'r').readlines()
     
     # ** NETWORK FORWARD PASS **
     probs_lists = batch_predict(gpu_index, batch_size, model_deploy_file, model_params_file, result_keys, img_filenames, image_mean_file, resize_dim)
@@ -65,8 +64,22 @@ def viewpoint(img_filenames, class_idxs, output_result_file):
     fout.write('model_params_file_3dview: %s\n' % (model_params_file))
     fout.close()
 
-
-# localization + viewpoint estimation
+'''
+@brief:
+    evaluation of joint localization and viewpoint estimation (azimuth only)
+    metric is AVP-NV
+@input:
+    cls_names - a list of strings of PASCAL3D class names
+    img_name_file_list - a list of filenames of images to be evaluated
+    det_bbox_mat_file_list - a list of det bbox file (contains boxes of Nx5, see combine_bbox_view.m for more)
+    result_folder - result .mat files will be saved there
+@output:
+    output .mat results (see combine_bbox_view.m for more details) into result_folder.
+    display AVP-NV results 
+@dependency:
+    combine_bbox_view.m (output <clsname>_v<NV>.mat like chair_v8.mat)
+    test_det.m  (assumes .mat files available in folder)
+'''
 def test_avp_nv(cls_names, img_name_file_list, det_bbox_mat_file_list, result_folder):
     C = len(cls_names)
     assert(C == len(img_name_file_list))
@@ -77,7 +90,7 @@ def test_avp_nv(cls_names, img_name_file_list, det_bbox_mat_file_list, result_fo
         os.mkdir(result_folder)
     
     for i,class_idx in enumerate(class_idxs):
-        img_filenames = [x.rstrip().split(' ')[0] for x in open(img_name_label_file_list[i]]
+        img_filenames = [x.rstrip().split(' ')[0] for x in open(img_name_file_list[i])]
         class_idxs = [int(class_idx) for _ in range(len(img_filenames))]
         
         # viewpoint estimation with caffe python
@@ -96,7 +109,21 @@ def test_avp_nv(cls_names, img_name_file_list, det_bbox_mat_file_list, result_fo
     os.system('%s -nodisplay -r "try %s ; catch; end; quit;"' % (g_matlab_executable_path, matlab_cmd))
 
 
-# viewpoint estimation
+'''
+@brief:
+    evaluation of 3D viewpoint estimation accuracy
+    metric is Acc-pi/6 and MedErr
+@input:
+    cls_names - a list of strings of PASCAL3D class names
+    img_name_file_list - a list of filenames of images to be evaluated
+    result_folder - result view estimation .txt files will be saved there
+    view_label_folder - assumes dir structure of <view_label_folder>/<classname>.txt each file containing <imgpath> <clsidx> <azimuth> <tilt> labels
+@output:
+    output 3D viewpoint estimation results into result_folder
+    display Acc and MedErr results
+@dependency:
+    test_gt.m (assumes <clsname>_pred_view.txt available in folder)
+'''
 def test_vp_acc(cls_names, img_name_file_list, result_folder, view_label_folder):
     assert(len(cls_names) == len(img_name_file_list))
     class_idxs = [g_shape_names.index(name) for name in cls_names]
@@ -105,13 +132,13 @@ def test_vp_acc(cls_names, img_name_file_list, result_folder, view_label_folder)
         os.mkdir(result_folder)
     
     for i,class_idx in enumerate(class_idxs):
-        img_filenames = [x.rstrip().split(' ')[0] for x in open(img_name_label_file_list[i]]
-        class_idxs = [int(class_idx) for _ in range(len(img_filenames))]
+        tmp_img_filenames = [x.rstrip().split(' ')[0] for x in open(img_name_file_list[i])]
+        tmp_class_idxs = [int(class_idx) for _ in range(len(tmp_img_filenames))]
         
         # viewpoint estimation with caffe python
         # wirte <result_folder>/<class_name>_pred_view.txt
         output_result_file = os.path.join(result_folder, cls_names[i]+'_pred_view.txt')
-        viewpoint(img_filenames, class_idxs, output_result_file)
+        viewpoint(tmp_img_filenames, tmp_class_idxs, output_result_file)
    
 
     # compute Acc and MedErr

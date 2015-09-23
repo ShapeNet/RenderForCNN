@@ -41,6 +41,12 @@ for k = 1:length(clsList)
     right_all = [right_all, right'];
     top_all = [top_all, top'];
     bottom_all = [bottom_all, bottom'];
+    
+    figure,
+    subplot(2,2,1), hist(left), title([cls ' left']);
+    subplot(2,2,2), hist(right), title([cls ' right']);
+    subplot(2,2,3), hist(top), title([cls ' top']);
+    subplot(2,2,4), hist(bottom), title([cls ' bottom']);
 end
 
 if visualize

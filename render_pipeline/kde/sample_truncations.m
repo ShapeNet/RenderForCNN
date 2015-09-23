@@ -30,10 +30,10 @@ rp = rp(1:numRandPerturbation);
 goodSamples(rp, :) = min(max(normrnd(0, 0.1, numRandPerturbation, 4),-0.5), 0.5);
 
 figure,
-subplot(2,2,1), hist(goodSamples(:,1), 32), title([cls ' left']);
-subplot(2,2,2), hist(goodSamples(:,2), 32), title([cls ' right']);
-subplot(2,2,3), hist(goodSamples(:,3), 32), title([cls ' top']);
-subplot(2,2,4), hist(goodSamples(:,4), 32), title([cls ' bottom']);
+subplot(2,2,1), histogram(goodSamples(:,1), 32, 'Normalization', 'probability'), title([cls ' left shift ratio']);
+subplot(2,2,2), histogram(goodSamples(:,2), 32,'Normalization', 'probability'), title([cls ' right shift ratio']);
+subplot(2,2,3), histogram(goodSamples(:,3), 32,'Normalization', 'probability'), title([cls ' top shift ratio']);
+subplot(2,2,4), histogram(goodSamples(:,4), 32,'Normalization', 'probability'), title([cls ' bottom shift ratio']);
 
 mkdir(g_truncation_distribution_folder);
 dlmwrite(fullfile(g_truncation_distribution_folder, sprintf('%s.txt', cls)), goodSamples, 'delimiter', ' ', 'precision', 6);

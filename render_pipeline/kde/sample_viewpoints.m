@@ -64,10 +64,10 @@ goodSamples(rp, 3) = randTilt;
 
 
 figure,
-subplot(2,2,1), hist(goodSamples(:,1), 32), title([cls ' azimuth']);
-subplot(2,2,2), hist(goodSamples(:,2), 32), title([cls ' elevation']);
-subplot(2,2,3), hist(goodSamples(:,3), 32), title([cls ' tilt']);
-subplot(2,2,4), hist(goodSamples(:,4), 32), title([cls ' distance']);
+subplot(2,2,1), histogram(goodSamples(:,1), 32, 'Normalization', 'probability'), title([cls ' azimuth']);
+subplot(2,2,2), histogram(goodSamples(:,2), 32,'Normalization', 'probability'), title([cls ' elevation']);
+subplot(2,2,3), histogram(goodSamples(:,3), 32,'Normalization', 'probability'), title([cls ' tilt']);
+subplot(2,2,4), histogram(goodSamples(:,4), 32,'Normalization', 'probability'), title([cls ' distance']);
 
 mkdir(g_view_distribution_folder);
 dlmwrite(fullfile(g_view_distribution_folder, sprintf('%s.txt', cls)), goodSamples, 'delimiter', ' ', 'precision', 6);
