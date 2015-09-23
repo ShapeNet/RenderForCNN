@@ -94,7 +94,7 @@ g_rcnn_detection_bbox_mat_filelist = os.path.join(g_detection_results_folder, 'b
 g_rcnn_caffe_model = '/orions3-zfs/projects/haosu/Image2Scene/data/pretrained_models/rcnn.caffemodel'
 
 # testing
-g_caffe_param_file = '/orions3-zfs/projects/haosu/Image2Scene/data/model_3dview_PASCAL3D/fine_tune_realtune_rcnn/snapshots_iter_800.caffemodel'
+g_caffe_param_file = '/orions3-zfs/projects/haosu/Image2Scene/data/model_3dview_PASCAL3D/fine_tune_realtune_rcnn/snapshots_iter_1000.caffemodel'
 #'/orions3-zfs/projects/haosu/Image2Scene/data/model_PASCAL3D/fine_tune_conv45_fc67_realtune/snapshots_iter_300.caffemodel' # #'/orions4-zfs/projects/rqi/Code/render4cnn/experiments/finetune_render_rcnn_AzimuthMoreWeight_NoSmoothLoss/snapshots_iter_70000.caffemodel' #'/orions4-zfs/projects/rqi/Code/render4cnn/experiments/finetune_render_rcnn/snapshots_iter_50000.caffemodel'
 g_caffe_deploy_file = '/orions4-zfs/projects/rqi/Code/render4cnn/view_estimation/view_estimation_deploy.prototxt'
 g_caffe_prob_keys = ['fc-azimuth','fc-elevation','fc-tilt']

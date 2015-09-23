@@ -1,6 +1,8 @@
 *.pyc
 *.m~
 *.mat
+*.mex*
+*.dll
 *.caffemodel
 *.solverstate
 global_variables.m
