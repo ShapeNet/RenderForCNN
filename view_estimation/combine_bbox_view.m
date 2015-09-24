@@ -18,11 +18,10 @@ if nargin < 5
    is3d = 0;
 end
 
-assert(~exist(output_folder, 'dir'));
 mkdir(output_folder);
 
-for cls_idx = 1:numel(g_voc12_rigid_cls_names)
-    cls = g_voc12_rigid_cls_names{cls_idx}
+for cls_idx = 1:numel(g_cls_names)
+    cls = g_cls_names{cls_idx}
     try 
     object = load(det_bbox_mat_file);
     boxes = object.boxes;

@@ -14,11 +14,12 @@ Render for CNN is released under the MIT License (refer to the LICENSE file for 
 ### Citing Render for CNN
 If you find Render for CNN useful in your research, please consider citing:
 
-    @inproceedings{su2015render4cnn,
+    @InProceedings{Su_2015_ICCV,
         Title={Render for CNN: Viewpoint Estimation in Images Using CNNs Trained with Rendered 3D Model Views},
-        Author={Su, Hao and Qi, Charles R. and Li, Yangyan and Guibas, Leonidas J. },
-        Booktitle={Computer Vision (ICCV), 2015 IEEE International Conference on},
-        Year={2015},
+        Author={Su, Hao and Qi, Charles R. and Li, Yangyan and Guibas, Leonidas J.},
+        Booktitle={The IEEE International Conference on Computer Vision (ICCV)},
+        month = {December},
+        Year= {2015}
     }
 
 ###  Render for CNN Image Synthesis Pipeline

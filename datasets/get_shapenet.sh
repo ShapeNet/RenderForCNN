@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# This script downloads the PASCAL3D+ (release 1.1) data and unzips it.
+# This script downloads the ShapeNet data and unzips it.
 
 DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 cd $DIR
