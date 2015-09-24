@@ -6,4 +6,5 @@
 *.caffemodel
 *.solverstate
 global_variables.m
+global_variables.py
 data/*

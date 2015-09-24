@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import os
+import socket
+
 g_render4cnn_root_folder = os.path.dirname(os.path.abspath(__file__))
 
 # ------------------------------------------------------------
 # PATHS
 # ------------------------------------------------------------
+g_blender_executable_path = 'blender' #!! MODIFY if necessary
+g_matlab_executable_path = 'matlab' # !! MODIFY if necessary
 g_data_folder = os.path.abspath(os.path.join(g_render4cnn_root_folder, 'data'))
 g_datasets_folder = os.path.abspath(os.path.join(g_render4cnn_root_folder, 'datasets'))
 g_shapenet_root_folder = os.path.join(g_datasets_folder, 'shapenetcore')
@@ -36,24 +40,24 @@ g_syn_images_bkg_overlaid_folder = os.path.join(g_data_folder, 'syn_images_cropp
 g_syn_bkg_filelist = os.path.join(g_sun2012pascalformat_root_folder, 'filelist.txt')
 g_syn_bkg_folder = os.path.join(g_sun2012pascalformat_root_folder, 'JPEGImages')
 g_syn_cluttered_bkg_ratio = 0.8
-g_blender_executable_path = '/orions-zfs/software/blender-2.71/blender'
-g_matlab_executable_path = '/orions3-zfs/software/matlab2014b/bin/matlab'
 g_blank_blend_file_path = os.path.join(g_render4cnn_root_folder, 'render_pipeline/blank.blend') 
 g_syn_images_num_per_category = 200000
 g_syn_rendering_thread_num = 20
 
-# Skip orions3 since model is store on orions3
-g_hostname_synset_idx_map = {'oriong.stanford.edu': [0,1],
-                             'orionp.stanford.edu': [2,3,4],
-                             'orionp2.stanford.edu': [5,6,7],
-                             'orions2.stanford.edu':[8,9], 
-                             'orions4.stanford.edu':[10,11]}
+# Rendering is computational demanding. you may want to consider using multiple servers.
+#g_hostname_synset_idx_map = {'<server1-hostname>': [0,1],
+#                             '<server2-hostname>': [2,3,4],
+#                             '<server3-hostname>': [5,6,7],
+#                             '<server4-hostname>':[8,9], 
+#                             '<server5-hostname>':[10,11]}
+g_hostname_synset_idx_map = {socket.gethostname(): range(12)}
+
 # Crop and overlay is IO-heavy, running on local FS is much faster
-g_crop_hostname_synset_idx_map = {'orions4.stanford.edu': range(12)}
-g_overlay_hostname_synset_idx_map = {'orions4.stanford.edu': range(12)}
+g_crop_hostname_synset_idx_map = {socket.gethostname(): range(12)}
+g_overlay_hostname_synset_idx_map = {socket.gethostname(): range(12)}
 
 # view and truncation distribution estimation
-g_matlab_kde_folder = os.path.join(g_render4cnn_root_folder, 'render_pipeline/kde/matlab_kde_package') #/orions-zfs/software/matlab-package/kde'
+g_matlab_kde_folder = os.path.join(g_render4cnn_root_folder, 'render_pipeline/kde/matlab_kde_package') 
 g_view_statistics_folder = os.path.join(g_data_folder, 'view_statistics')
 g_view_distribution_folder = os.path.join(g_data_folder, 'view_distribution')
 g_view_distribution_files = dict(zip(g_shape_synsets, [os.path.join(g_view_distribution_folder, name+'.txt') for name in g_shape_names]))
@@ -66,8 +70,6 @@ g_syn_light_num_lowbound = 0
 g_syn_light_num_highbound = 6
 g_syn_light_dist_lowbound = 8
 g_syn_light_dist_highbound = 20
-
-
 
 # ------------------------------------------------------------
 # VIEW_ESTIMATION
@@ -90,11 +92,8 @@ g_real_images_voc12train_all_gt_bbox_lmdb_prefix = os.path.join(g_real_images_lm
 g_detection_results_folder = os.path.join(g_data_folder, 'detection_results')
 g_rcnn_detection_bbox_mat_filelist = os.path.join(g_detection_results_folder, 'bbox_mat_filelist.txt')
 
-# training
-g_rcnn_caffe_model = '/orions3-zfs/projects/haosu/Image2Scene/data/pretrained_models/rcnn.caffemodel'
-
 # testing
-g_caffe_param_file = '/orions3-zfs/projects/haosu/Image2Scene/data/model_3dview_PASCAL3D/fine_tune_realtune_rcnn/snapshots_iter_1000.caffemodel'
-g_caffe_deploy_file = '/orions4-zfs/projects/rqi/Code/render4cnn/view_estimation/view_estimation_deploy.prototxt'
+g_caffe_param_file = os.path.join(g_render4cnn_root_folder,'caffe_models', 'render4cnn_3dview.caffemodel') 
+g_caffe_deploy_file = os.path.join(g_render4cnn_root_folder, 'caffe_models', 'deploy.prototxt') 
+g_image_mean_file = os.path.join(g_render4cnn_root_folder, 'caffe_models', 'imagenet_mean.npy') 
 g_caffe_prob_keys = ['fc-azimuth','fc-elevation','fc-tilt']
-g_image_mean_file = '/orions3-zfs/projects/rqi/Data/deploy/imagenet_mean.npy'
