@@ -22,6 +22,12 @@ If you find Render for CNN useful in your research, please consider citing:
         Year= {2015}
     }
 
+### Contents
+1. [Render for CNN Image Synthesis Pipeline](#render-for-cnn-image-synthesis-pipeline)
+2. [Off-the-shelf Viewpoint Estimator](#off-the-shelf-viewpoint-estimator)
+3. [Testing on VOC12 val](#testing-on-voc12-val)
+4. [Training your Own Models](#training-your-own-models)
+
 ###  Render for CNN Image Synthesis Pipeline
 
 **Prerequisites**
@@ -86,7 +92,7 @@ This small demo at `demo_render` shows how we get cropped, background overlaid i
     python render_pipeline/run_overlay.py
     </pre>
 
-### Viewpoint Estimation
+### Off-the-shelf Viewpoint Estimator
 
 **Prerequisites**
 
@@ -98,7 +104,7 @@ This small demo at `demo_render` shows how we get cropped, background overlaid i
     cd caffe_models
     sh fetch_model.sh
     </pre>
-    
+
 **Set up paths**
 
 The steps are the same as above in Render for CNN Image Synthesis Pipeline.
@@ -115,5 +121,7 @@ To visualize the estimated 3D viewpoint, run and see a rendered image of the vie
 
 
 ### Testing on VOC12 val
+to be updated.
 
 ### Training your Own Models
+to be updated.

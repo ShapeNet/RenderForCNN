@@ -6,6 +6,7 @@
 % input: bbox: N*5 (x1,y1,x2,y2,score), view: N*3 (azimuth, elevation, tilt)
 % output: combined: N*8 (x1,y1,x2,y2,azimuth,elevation,tilt,score) as aeroplane_3dview.mat etc.
 %
+% cls: one of PASCAL3D+ class names
 % view_pred_file: each line is view for an image
 % det_bbox_mat_file: .mat file with object "boxes" as Nx5 array
 %
@@ -20,9 +21,7 @@ end
 
 mkdir(output_folder);
 
-for cls_idx = 1:numel(g_cls_names)
-    cls = g_cls_names{cls_idx}
-    try 
+try 
     object = load(det_bbox_mat_file);
     boxes = object.boxes;
     views = importdata(view_pred_file);
@@ -36,10 +35,8 @@ for cls_idx = 1:numel(g_cls_names)
           save(fullfile(output_folder, sprintf('%s_v%s.mat',cls, num2str(vnum_test))), 'dets');
         end
     end
-    catch
-      fprintf('%s error..', cls);
-      continue;
-    end
+catch
+    fprintf('%s error..', cls);
 end
 
 
