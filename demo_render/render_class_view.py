@@ -6,7 +6,7 @@ import argparse
 import os, tempfile, glob, shutil
 
 BASE_DIR = osp.dirname(__file__)
-sys.path.append(osp.join(BASE_DIR,'../../'))
+sys.path.append(osp.join(BASE_DIR,'../'))
 from global_variables import *
 
 
@@ -20,7 +20,7 @@ parser.add_argument('-o', '--output_img', help='Output img filename.', default=o
 args = parser.parse_args()
 
 blank_file = osp.join(g_blank_blend_file_path)
-render_code = osp.join(BASE_DIR, '../render_model_views.py')
+render_code = osp.join(g_render4cnn_root_folder, 'render_pipeline/render_model_views.py')
 
 # MK TEMP DIR
 temp_dirname = tempfile.mkdtemp()

@@ -16,11 +16,10 @@ random.seed(datetime.now())
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR,'../'))
-sys.path.append(os.path.join(BASE_DIR,'../../'))
 from global_variables import *
 
 # set debug mode
-debug_mode = 0
+debug_mode = 1
 
 if debug_mode:
     io_redirect = ''
@@ -66,7 +65,7 @@ syn_images_cropped_folder = os.path.join(BASE_DIR, 'demo_images_cropped')
 truncation_samples_file = os.path.join(BASE_DIR, 'sample_truncations.txt')
 
 # run matlab code
-matlab_cmd = "addpath('%s'); crop_images('%s','%s','%s',1);" % (os.path.dirname(BASE_DIR), syn_images_folder, syn_images_cropped_folder, truncation_samples_file)
+matlab_cmd = "addpath('%s'); crop_images('%s','%s','%s',1);" % (os.path.join(g_render4cnn_root_folder, 'render_pipeline'), syn_images_folder, syn_images_cropped_folder, truncation_samples_file)
 print ">> Starting MATLAB ... to run cropping command: \n \t %s" % matlab_cmd
 os.system('%s -nodisplay -r "try %s ; catch; end; quit;" %s' % (g_matlab_executable_path, matlab_cmd, io_redirect))
 
@@ -84,7 +83,7 @@ im.show()
 syn_images_cropped_bkg_overlaid_folder = os.path.join(BASE_DIR, 'demo_images_cropped_bkg_overlaid')
 
 # run code
-matlab_cmd = "addpath('%s'); overlay_background('%s','%s','%s', '%s', %f, 1);" % (os.path.dirname(BASE_DIR), syn_images_cropped_folder, syn_images_cropped_bkg_overlaid_folder, bkg_filelist, bkg_folder, 1.0)
+matlab_cmd = "addpath('%s'); overlay_background('%s','%s','%s', '%s', %f, 1);" % (os.path.join(g_render4cnn_root_folder, 'render_pipeline'), syn_images_cropped_folder, syn_images_cropped_bkg_overlaid_folder, bkg_filelist, bkg_folder, 1.0)
 print ">> Starting MATLAB ... to run background overlaying command: \n \t %s" % matlab_cmd
 os.system('%s -nodisplay -r "try %s ; catch; end; quit;" %s' % (g_matlab_executable_path, matlab_cmd, io_redirect))
 

@@ -23,7 +23,7 @@ g_shape_synset_name_pairs = [('02691156', 'aeroplane'),
                              ('02924116', 'bus'),
                              ('02958343', 'car'),
                              ('03001627', 'chair'),
-                             ('04379243', 'diningtable'), #TODO dining?
+                             ('04379243', 'diningtable'),
                              ('03790512', 'motorbike'),
                              ('04256520', 'sofa'),
                              ('04468005', 'train'),
@@ -95,9 +95,6 @@ g_rcnn_caffe_model = '/orions3-zfs/projects/haosu/Image2Scene/data/pretrained_mo
 
 # testing
 g_caffe_param_file = '/orions3-zfs/projects/haosu/Image2Scene/data/model_3dview_PASCAL3D/fine_tune_realtune_rcnn/snapshots_iter_1000.caffemodel'
-#'/orions3-zfs/projects/haosu/Image2Scene/data/model_PASCAL3D/fine_tune_conv45_fc67_realtune/snapshots_iter_300.caffemodel' # #'/orions4-zfs/projects/rqi/Code/render4cnn/experiments/finetune_render_rcnn_AzimuthMoreWeight_NoSmoothLoss/snapshots_iter_70000.caffemodel' #'/orions4-zfs/projects/rqi/Code/render4cnn/experiments/finetune_render_rcnn/snapshots_iter_50000.caffemodel'
 g_caffe_deploy_file = '/orions4-zfs/projects/rqi/Code/render4cnn/view_estimation/view_estimation_deploy.prototxt'
 g_caffe_prob_keys = ['fc-azimuth','fc-elevation','fc-tilt']
 g_image_mean_file = '/orions3-zfs/projects/rqi/Data/deploy/imagenet_mean.npy'
-#g_test_prototxt_template_file = os.path.join(g_render4cnn_root_folder, 'view_estimation', 'template_test.prototxt')
-#g_test_prototxt_batch_size = 64
