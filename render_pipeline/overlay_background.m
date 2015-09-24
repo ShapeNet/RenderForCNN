@@ -1,17 +1,27 @@
-function overlay_background(src_folder, dst_folder, bkgFilelist, bkgFolder, clutteredBkgRatio)
+function overlay_background(src_folder, dst_folder, bkgFilelist, bkgFolder, clutteredBkgRatio, single_thread)
+
+if nargin < 6
+    single_thread = 1;
+end
+if single_thread
+    num_workers = 0;
+else
+    num_workers = 24;
+end
 
 image_files = rdir(fullfile(src_folder,'*/*.png'));
 image_num = length(image_files);
 fprintf('%d images in total.\n', image_num);
 sunImageList = importdata(bkgFilelist);
+rng('shuffle');
 
 fprintf('Start overlaying images at time %s, it takes for a while...\n', datestr(now, 'HH:MM:SS'));
 report_num = 80;
 fprintf([repmat('.',1,report_num) '\n\n']);
 report_step = floor((image_num+report_num-1)/report_num);
 t_begin = clock;
-%for i = 1:length(src_image_list)
-parfor i = 1:image_num
+%for i = 1:image_num
+parfor(i = 1:image_num, num_workers)
     src_image_file = image_files(i).name;
     try
         [I, ~, alpha] = imread(src_image_file);       

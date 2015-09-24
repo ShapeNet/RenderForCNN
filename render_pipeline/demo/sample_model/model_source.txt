@@ -1,1 +1,1 @@
-02691156/model_aligned/1caa02b831cccff090baeef8ba5b93e5/model_aligned_normalized.obj
+shapenetcore/03001627/21bfb150cfc23accb01c58badc8bbc39

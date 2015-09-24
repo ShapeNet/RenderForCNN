@@ -1,8 +1,18 @@
-function crop_images(src_folder, dst_folder, truncation_distr_file)
+function crop_images(src_folder, dst_folder, truncation_distr_file, single_thread)
+
+if nargin < 4
+    single_thread = 1;
+end
+if single_thread
+    num_workers = 0;
+else
+    num_workers = 24;
+end
 
 image_files = rdir(fullfile(src_folder,'*/*.png'));
 image_num = length(image_files);
 fprintf('%d images in total.\n', image_num);
+rng('shuffle');
 truncationParameters = importdata(truncation_distr_file);
 truncationParametersSub = truncationParameters(randi([1,length(truncationParameters)],1,image_num),:);
 
@@ -11,7 +21,8 @@ report_num = 80;
 fprintf([repmat('.',1,report_num) '\n\n']);
 report_step = floor((image_num+report_num-1)/report_num);
 t_begin = clock;
-parfor i = 1:image_num
+%for i = 1:image_num
+parfor(i = 1:image_num, num_workers)
     src_image_file = image_files(i).name;
     try
         [I, ~, alpha] = imread(src_image_file);       

@@ -53,7 +53,7 @@ g_crop_hostname_synset_idx_map = {'orions4.stanford.edu': range(12)}
 g_overlay_hostname_synset_idx_map = {'orions4.stanford.edu': range(12)}
 
 # view and truncation distribution estimation
-g_matlab_kde_folder = '/orions-zfs/software/matlab-package/kde'
+g_matlab_kde_folder = os.path.join(g_render4cnn_root_folder, 'render_pipeline/kde/matlab_kde_package') #/orions-zfs/software/matlab-package/kde'
 g_view_statistics_folder = os.path.join(g_data_folder, 'view_statistics')
 g_view_distribution_folder = os.path.join(g_data_folder, 'view_distribution')
 g_view_distribution_files = dict(zip(g_shape_synsets, [os.path.join(g_view_distribution_folder, name+'.txt') for name in g_shape_names]))
