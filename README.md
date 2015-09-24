@@ -24,10 +24,13 @@ If you find Render for CNN useful in your research, please consider citing:
 ###  Render for CNN Image Synthesis Pipeline
 
 **Prerequisites**
-0. Blender (tested with Blender 2.71 on 64-bit Linux). You can get it from <a href="http://www.blender.org/features/past-releases/2-71/" target="_blank">Blender website</a> for free.
-1. MATLAB (tested with 2014b on 64-bit Linux). You also need to compile the external kde package in `render_pipeline/kde/matlab_kde_package` by following the `README.txt` file in that folder.
-2. Datasets (ShapeNet, PASCAL3D+, SUN2012) [not required for small demo]. If you already have the same datasets (as in urls specified in the shell scripts) downloaded, you can build soft links to the datasets with the same pathname as specified in the shell scripts. Otherwise, just do the following steps under project root folder:
 
+0. Blender (tested with Blender 2.71 on 64-bit Linux). You can get it from <a href="http://www.blender.org/features/past-releases/2-71/" target="_blank">Blender website</a> for free.
+
+1. MATLAB (tested with 2014b on 64-bit Linux). You also need to compile the external kde package in `render_pipeline/kde/matlab_kde_package` by following the `README.txt` file in that folder.
+
+2. Datasets (ShapeNet, PASCAL3D+, SUN2012) [not required for small demo]. If you already have the same datasets (as in urls specified in the shell scripts) downloaded, you can build soft links to the datasets with the same pathname as specified in the shell scripts. Otherwise, just do the following steps under project root folder:
+	
     <pre>
     bash dataset/get_shapenet.sh
     bash dataset/get_sun2012pascalformat.sh
@@ -48,7 +51,7 @@ After setting Blender and MATLAB paths in `global_variables.py`, run script to s
 This small demo at `demo_render` shows how we get cropped, background overlaid images of objects from a 3D model. It also helps verity that you have all enviroment set up. To run the demo, follow steps below.
 
 	cd demo_render
-    python run_demo.py
+	python run_demo.py
 
 #### Running large scale synthesis
 
@@ -83,8 +86,11 @@ This small demo at `demo_render` shows how we get cropped, background overlaid i
     </pre>
 
 ### Viewpoint Estimation
+
 **Prerequisites**
+
 0. <a href="https://github.com/BVLC/caffe" target="_blank">Caffe</a> (with pycaffe compiled). For testing we support the new caffe interface and prototxt files (which uses "layer" instead of "layers" in prototxt file). You can follow <a href="http://caffe.berkeleyvision.org/installation.html" target="_blank">this webpage</a> for installation details.
+
 1. Download our pre-trained caffe model (~390MB). The model was trained on rendered images and VOC12 train set real images.
 
     <pre>
