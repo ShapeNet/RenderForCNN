@@ -97,3 +97,4 @@ g_caffe_param_file = os.path.join(g_render4cnn_root_folder,'caffe_models', 'rend
 g_caffe_deploy_file = os.path.join(g_render4cnn_root_folder, 'caffe_models', 'deploy.prototxt') 
 g_image_mean_file = os.path.join(g_render4cnn_root_folder, 'caffe_models', 'imagenet_mean.npy') 
 g_caffe_prob_keys = ['fc-azimuth','fc-elevation','fc-tilt']
+g_test_batch_size = 64

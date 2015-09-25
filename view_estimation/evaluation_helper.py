@@ -24,7 +24,7 @@ from caffe_utils import *
     write 3d viewpoint estimation results to output_result_file
 '''
 def viewpoint(img_filenames, class_idxs, output_result_file):
-    batch_size = 64
+    batch_size = g_test_batch_size
     model_params_file = g_caffe_param_file
     model_deploy_file = g_caffe_deploy_file
     result_keys = g_caffe_prob_keys
@@ -62,6 +62,165 @@ def viewpoint(img_filenames, class_idxs, output_result_file):
     fout.write('model_deploy_file_3dview: %s\n' % (model_deploy_file))
     fout.write('model_params_file_3dview: %s\n' % (model_params_file))
     fout.close()
+
+
+'''
+@brief:
+    get local maximums from an 1-D array of angles (e.g. if len(prob)=360 then 0==360)
+@input: 
+    prob: N*1 array
+    num_bin: local area width
+    diff_threshold: regard close preds as duplicates
+@output: 
+    preds_list: a list of (pred,prob-for-the-pred) tuples 
+'''
+def get_top_preds(prob, num_bin=8, diff_threshold=10):
+    N = len(prob)
+    bin_width = N/num_bin
+    preds_list = [] # list of tuples of (<pred>, <prob-of-the-pred>)
+    preds_list.append((prob.argmax(), max(prob)))
+
+    for i in range(0,num_bin):
+        # get local top pred
+        prob_bin = probs[i*bin_width : (i+1)*bin_width]
+        local_pred = prob_bin.argmax() + i*bin_width
+        local_prob = max(prob_bin)
+
+        # verify
+        duplicate = 0
+        for pred, _ in preds_list:
+            if min(abs(local_pred - pred, N - abs(local_pred - pred))) < diff_threshold:
+                duplicate = 1 # too close to existed pred
+                break
+        if duplicate == 0:
+            preds.append((local_pred, local_prob))
+
+    preds_list = sorted(preds_list, key=lambda item:item[1], reverse=True)
+    return preds_list
+
+
+
+'''
+@brief:
+    get topk confident viewpoint predictions from probs
+@input:
+    probs_3dview - a length-3 list of azimuth, elevation and tilt probs (each is length-360 list)
+    topk (K) - integer (1000=>K>=1). only return top K confident result
+@output:
+    return topk_viewpoints - a length-topk list of tuples of (<viewpoint-tuple>, <confidence>), where
+    <viewpoint-tuple> is a length-3 tuples of azimuth, elevation and tilt angles in degree
+'''
+def get_topk_viewpoints(probs_3dview, topk):
+    assert(topk>=1 and topk<=1000)
+    for n in range(10):
+        if n^3 >= topk: break
+
+    # secure softmax. used to normalize an array to 0~1 with sum as 1
+    def my_softmax(x):
+        ex = np.exp(x - np.max(x))
+        out = ex / ex.sum()
+        return out
+
+    preds_list_azimuth = get_top_preds(probs_3dview[0], 16, 10)[0:n]
+    print 'prob azimuth:\n', probs_3dview[0]
+    print 'preds_list_azimuth:\n', preds_list_azimuth
+    preds_list_elevation = get_top_preds(probs_3dview[0], 36, 8)[0:n]
+    preds_list_tilt = get_top_preds(probs_3dview[0], 72, 3)[0:n]
+
+    viewpoints_list = []
+    for i in range(n):
+        for j in range(n):
+            for k in range(n):
+                apred,aprob = preds_list_azimuth[i]
+                epred,eprob = preds_list_elevation[j]
+                tpred,tprob = preds_list_tilt[k]
+                viewpoints_list.append(((apred,epred,tpred),np.log(aprob)+np.log(eprob)+np.log(tprob)))
+
+    viewpoints_list = sorted(viewpoints_list, key=lambda item:item[1], reverse=True)
+    topk_viewpoints = viewpoints_list[0:topk]
+
+    return topk_viewpoints
+    
+
+
+'''
+@brief:
+    predict 3d viewpoint of object, output **TOP-k** prediction results (compatible with NEW caffe interface - 2015 Aug)
+@input:
+    img_filenames - list of image filenames
+    class_idxs - list of class index (0~11)
+    topk (K) - integer number (1000=>K>=1). choose top K prediction results (in default, set to 1)
+    output_result_file - string. output estimated viewpoints into this file
+@output:
+    return preds - a lenght-len(img_filenames) list of length-topk list of tuples 
+        of (<viewpoint-tuple>, <confidence>), ranked by confidence (high to low),
+        where <viewpoint-tuple> is a length-3 tuple of azimuth, elevation, tilt angles in degree
+
+        e.g. for len(img_filenames)=3 and topk=2, preds is like
+            [ [((a,e,t),c),((a,e,t),c)], 
+              [((a,e,t),c),((a,e,t),c)], 
+              [((a,e,t),c),((a,e,t),c)] ]
+
+    if output_result_file is not None
+        write 3d viewpoint estimation results to output_result_file, each line has Kx(3+1) numbers as 
+        "<azimuth-top1> <elevation-top1> <tilt-top1> <confidence-top1> <azimuth-top2> <elevation-top2> <tilt-top2> <confidence-top2> ..."
+        write output log file to <output_result_file>.log
+'''
+def viewpoint_topk(img_filenames, class_idxs, topk=1, output_result_file=None):
+    batch_size = g_test_batch_size
+    model_params_file = g_caffe_param_file
+    model_deploy_file = g_caffe_deploy_file
+    result_keys = g_caffe_prob_keys
+    resize_dim = g_images_resize_dim
+    image_mean_file = g_image_mean_file
+    assert(topk>=1 and topk<=1000)
+    
+    # ** NETWORK FORWARD PASS **
+    probs_lists = batch_predict(model_deploy_file, model_params_file, batch_size, result_keys, img_filenames, image_mean_file, resize_dim)
+    
+    # EXTRACT PRED FROM PROBS
+    preds = []
+    for k in range(len(img_filenames)):
+        preds.append([])
+    for i in range(len(img_filenames)):
+        class_idx = class_idxs[i]
+
+        # probs_3dview is length-3 list of azimuth, elevation and tilt probs (each is length-360 list)
+        probs_3dview = [] 
+        for k in range(len(result_keys)):
+            # probs for class_idx:
+            # class_idx*360~class_idx*360+360-1
+            probs = probs_lists[k][i]
+            probs = probs[class_idx*360:(class_idx+1)*360]
+            probs_3dview.append(probs)
+       
+        # get topk viewpoints: length-topk list of lenght-3 tuples
+        topk_viewpoints = get_topk_viewpoints(probs_3dview, topk)
+        preds[i] = topk_viewpoints
+    
+    if output_result_file is not None:
+        # OUTPUT: apred epred tpred
+        fout = open(output_result_file, 'w')
+        for i in range(len(img_filenames)):
+            topk_views = preds[i] 
+            for k in range(topk):
+                va,ve,vt = topk_views[k][0]
+                confidence = topk_views[k][1]
+                fout.write('%d %d %d %f' % (va,ve,vt,confidence))
+            fout.write('\n')
+        fout.close()
+        
+        
+        # OUTPUT: log file
+        log_output_filename = output_result_file+'.log'
+        fout = open(log_output_filename, 'w')
+        fout.write("output_result_file: %s\nresize_dim: %d\ntopk: %d\n" % 
+                (output_result_file, resize_dim, topk))
+        fout.write('model_deploy_file_3dview: %s\n' % (model_deploy_file))
+        fout.write('model_params_file_3dview: %s\n' % (model_params_file))
+        fout.close()
+
+    return preds
 
 '''
 @brief:
