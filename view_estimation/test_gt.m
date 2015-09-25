@@ -38,7 +38,7 @@ if write_result
     end
     fprintf(fid, '\n');
     for k = 1:N
-        fprintf(fid, sprintf('%f ', mederr(k)));
+        fprintf(fid, sprintf('%f ', mederr(k)/pi*180));
     end
     fprintf(fid, '\n');
     fprintf(fid, 'Mean acc = %f\n', mean(acc));

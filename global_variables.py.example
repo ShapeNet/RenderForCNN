@@ -15,7 +15,7 @@ g_data_folder = os.path.abspath(os.path.join(g_render4cnn_root_folder, 'data'))
 g_datasets_folder = os.path.abspath(os.path.join(g_render4cnn_root_folder, 'datasets'))
 g_shapenet_root_folder = os.path.join(g_datasets_folder, 'shapenetcore')
 g_pascal3d_root_folder = os.path.join(g_datasets_folder, 'pascal3d')
-g_sun2012pascalformat_root_folder = os.path.join(g_datasets_folder, 'sun12pascalformat')
+g_sun2012pascalformat_root_folder = os.path.join(g_datasets_folder, 'sun2012pascalformat')
 
 # ------------------------------------------------------------
 # RENDER FOR CNN PIPELINE

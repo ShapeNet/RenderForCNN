@@ -1,7 +1,7 @@
 function overlay_background(src_folder, dst_folder, bkgFilelist, bkgFolder, clutteredBkgRatio, single_thread)
 
 if nargin < 6
-    single_thread = 1;
+    single_thread = 0;
 end
 if single_thread
     num_workers = 0;
@@ -12,6 +12,9 @@ end
 image_files = rdir(fullfile(src_folder,'*/*.png'));
 image_num = length(image_files);
 fprintf('%d images in total.\n', image_num);
+if image_num == 0
+    return;
+end
 sunImageList = importdata(bkgFilelist);
 rng('shuffle');
 

@@ -36,7 +36,7 @@ If you find Render for CNN useful in your research, please consider citing:
 
 1. MATLAB (tested with 2014b on 64-bit Linux). You also need to compile the external kde package in `render_pipeline/kde/matlab_kde_package` by following the `README.txt` file in that folder.
 
-2. Datasets (ShapeNet, PASCAL3D+, SUN2012) [not required for small demo]. If you already have the same datasets (as in urls specified in the shell scripts) downloaded, you can build soft links to the datasets with the same pathname as specified in the shell scripts. Otherwise, just do the following steps under project root folder:
+2. Datasets (ShapeNet, PASCAL3D+, SUN2012) [**not required for the demo**]. If you already have the same datasets (as in urls specified in the shell scripts) downloaded, you can build soft links to the datasets with the same pathname as specified in the shell scripts. Otherwise, just do the following steps under project root folder:
 	
     <pre>
     bash dataset/get_shapenet.sh
@@ -46,7 +46,7 @@ If you find Render for CNN useful in your research, please consider citing:
     
 **Set up paths**
 
-All data and code paths should be set in `global_variables.py`. We have provided you an example version `global_variables.py.example`. You only need to copy or rename the example file and modify the Blender and MATLAB path in it (in default the paths are set to `blend` and `matlab`). All other paths are relative to the project root folder and should be fine.
+All data and code paths should be set in `global_variables.py`. We have provided you an example version `global_variables.py.example`. You only need to copy or rename the example file and **modify the Blender and MATLAB path** in it (in default the paths are set to `blend` and `matlab`). All other paths are relative to the project root folder and should be fine.
 
 	cp global_variables.py.example global_variables.py
     
@@ -55,42 +55,46 @@ After setting Blender and MATLAB paths in `global_variables.py`, run script to s
 	python setup.py
 
 #### Demo of synthesis pipeline
-This small demo at `demo_render` shows how we get cropped, background overlaid images of objects from a 3D model. It also helps verity that you have all enviroment set up. To run the demo, follow steps below.
+This small demo at `demo_render` shows how we get cropped, background overlaid images of objects from a 3D model. It also helps verity that you have all enviroment set up. To run the demo, cd into project root folder and follow steps below.
 
 	cd demo_render
 	python run_demo.py
 
 #### Running large scale synthesis
 
-0. Estimate of viewpoint and truncation distributions with KDE (kernal density estimation).
+0. **Estimate viewpoint and truncation distributions** with KDE (kernal density estimation). If you haven't compiled the kde package, go to `render_pipeline/kde/matlab_kde_package/mex`, open MATLAB and run `makemex` in MATLAB to generate mex files.
 	
     <pre>
     cd render_pipeline/kde
     </pre>
     
-    Open matlab and run the following command (expect to see plots popping up)
+    Open MATLAB and run the following command (expect to see plots popping up). Viewpoint and truncation statistics will be saved to `data/view_statistics` and `data/truncation_statistics`. Samples generated from estimated distrubtion will be saved to `data/view_distribution` and `truncation_distribution`.
     
     <pre>
     run_sampling;
     </pre>
     
-1. Render images with Blender. This step is computationally heavy and may take a long time depending how powerful your computers are. It takes us around 8 hours to render 2.4M images on 6 multi-core servers. If you have multiple servers with shared filesystem, you can set `g_hostname_synset_idx_map` in `global_variables.py` accordingly. Note that currently models are directly from ShapeNet, deformed models will be released separately later. 
+1. **Render images with Blender** This step is computationally heavy and may take a long time depending how powerful your computers are. It takes us around 8 hours to render 2.4M images on 6 multi-core servers. If you have multiple servers with shared filesystem, you can set `g_hostname_synset_idx_map` in `global_variables.py` accordingly. Note that currently models are directly from ShapeNet, deformed models will be released separately later. 
     
     <pre>
     python render_pipeline/run_render.py
     </pre>
     
-2. Cropp images. This step is IO heavy and it takes around 1~2 hours on a multi-core server. SSD or high-end HDD disk could help a lot.
+    You can stop rendering at any time and execute following commands to crop and overlay background on images that have already been rendered. In default, rendered images will be saved at `data/syn_images`.
+
+2. **Crop images** This step is IO heavy and it takes around 1~2 hours on a multi-core server. SSD or high-end HDD disk could help a lot. In default, cropped images are saved to `data/syn_images_cropped`.
     
     <pre>
     python render_pipeline/run_crop.py
     </pre>
     
-3. Overlay backgrounds. Time consumption is similar to cropping step above.
+3. **Overlay backgrounds** Time consumption is similar to cropping step above. In default, background overlaid (also cropped from step above) images are saved to `data/syn_images_cropped_bkg_overlaid`.
    
     <pre>
     python render_pipeline/run_overlay.py
     </pre>
+
+    If you'd like to get a file containing all synthesized image filenames and their labels (class, azimuth, elevation, tilt angles), we have some helper functions for that - just go look at `get_one_category_image_label_file` and `combine_files` in `view_estimation/data_prep_helper.py`, also refer to `view_estimation/prepare_training_data.py` for usage examples.
 
 ### Off-the-shelf Viewpoint Estimator
 
@@ -121,7 +125,35 @@ To visualize the estimated 3D viewpoint, run and see a rendered image of the vie
 
 
 ### Testing on VOC12 val
-to be updated.
+
+**Prerequisites**
+
+0. Caffe with python interface and pretrained caffe mdoel - as in requirement in [Off-the-shelf Viewpoint Estimator](#off-the-shelf-viewpoint-estimator).
+
+1. PASCAL3D+ dataset - if you haven't downloaded it. It will be used for preparing test images and evaluation.
+    
+    <pre>
+    bash dataset/get_pascal3d.sh
+    </pre>
+
+2. MATLAB for preparing test images.
+
+**Set up paths**
+
+The steps are the same as above in Render for CNN Image Synthesis Pipeline.
+
+#### Evaluation of AVP-NV, Acc-\pi/6 and MedErr
+For AVP-NV (Average Viewpoint Precision), both localization (from R-CNN) and viewpoint estimation (azimuth) are evaluated. For Acc-\pi/6 and MedErr, we evaluate on VOC12 val images without truncations and occlusions. For more details on definition of the metrics, please refer to the paper.
+
+Firstly, we need to prepare the testing images from VOC12, by running:
+
+    python view_estimation/prepare_testing_data.py
+
+Then, do evaluation by running:
+
+    python view_estimation/run_evaluation.py
+
+Results are displayed on screen and saved to `view_estimation/avp_test_results/` and `view_estimation/vp_test_results/acc_mederr_results.txt`
 
 ### Training your Own Models
 to be updated.

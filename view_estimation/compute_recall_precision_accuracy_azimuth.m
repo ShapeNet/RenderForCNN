@@ -23,11 +23,11 @@ azimuth_interval = [0 (360/(vnum_test*2)):(360/vnum_test):360-(360/(vnum_test*2)
 
 % viewpoint annotation path
 %path_ann_view = '../Annotations';
-path_ann_view = fullfile(g_pascal3d_path, 'Annotations');
+path_ann_view = fullfile(g_pascal3d_root_folder, 'Annotations');
 
 % read ids of validation images
-addpath(fullfile(g_pascal3d_path, 'VDPM'));
-addpath(fullfile(g_pascal3d_path, 'PASCAL/VOCdevkit/VOCcode'));
+addpath(fullfile(g_pascal3d_root_folder, 'VDPM'));
+addpath(fullfile(g_pascal3d_root_folder, 'PASCAL/VOCdevkit/VOCcode'));
 VOCinit;
 %pascal_init;
 ids = textread(sprintf(VOCopts.imgsetpath, 'val'), '%s');

@@ -24,7 +24,6 @@ from caffe_utils import *
     write 3d viewpoint estimation results to output_result_file
 '''
 def viewpoint(img_filenames, class_idxs, output_result_file):
-    gpu_index = 0
     batch_size = 64
     model_params_file = g_caffe_param_file
     model_deploy_file = g_caffe_deploy_file
@@ -33,7 +32,7 @@ def viewpoint(img_filenames, class_idxs, output_result_file):
     image_mean_file = g_image_mean_file
     
     # ** NETWORK FORWARD PASS **
-    probs_lists = batch_predict(gpu_index, batch_size, model_deploy_file, model_params_file, result_keys, img_filenames, image_mean_file, resize_dim)
+    probs_lists = batch_predict(model_deploy_file, model_params_file, batch_size, result_keys, img_filenames, image_mean_file, resize_dim)
     
     # EXTRACT PRED FROM PROBS
     preds = []

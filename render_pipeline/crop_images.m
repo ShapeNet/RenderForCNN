@@ -1,7 +1,7 @@
 function crop_images(src_folder, dst_folder, truncation_distr_file, single_thread)
 
 if nargin < 4
-    single_thread = 1;
+    single_thread = 0;
 end
 if single_thread
     num_workers = 0;
@@ -12,6 +12,9 @@ end
 image_files = rdir(fullfile(src_folder,'*/*.png'));
 image_num = length(image_files);
 fprintf('%d images in total.\n', image_num);
+if image_num == 0
+    return;
+end
 rng('shuffle');
 truncationParameters = importdata(truncation_distr_file);
 truncationParametersSub = truncationParameters(randi([1,length(truncationParameters)],1,image_num),:);

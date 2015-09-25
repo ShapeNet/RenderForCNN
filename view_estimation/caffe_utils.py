@@ -128,17 +128,33 @@ def load_vector_from_lmdb(dbname, feat_dim, max_num=float('Inf')):
     in_db.close()
     return feats
 
-
-def batch_predict(gpu_index, BATCH_SIZE,  model_deploy_file, model_params_file, result_keys, img_files, mean_file, resize_dim = 0): 
+'''
+@brief:
+    batch caffe net forwarding.
+@inpiut:
+    model_deploy_file: caffe prototxt deploy file (new version using layer instead of layers)
+    model_params_file: .caffemodel file
+    BATCH_SIZE: depending on your GPU memory, can be as large as you want.
+    result_keys: names of features (1D vector) you want to extract
+    img_files: filenames of images to be tested
+    mean_file: used for substraction in preprocessing of the image
+    resize_dim (D): resize image to DxD
+@output:
+    return features in a list [<features1>, <features2>,...] of len(result_keys)
+    <features1> is a list of [<nparray-feature1-of-image1>, <nparray-of-feature1-of-image2>,...] of len(img_files)
+'''
+def batch_predict(model_deploy_file, model_params_file, BATCH_SIZE, result_keys, img_files, mean_file, resize_dim = 0): 
     # set imagenet_mean
-    #imagenet_mean = np.array([104,117,123])
-    imagenet_mean = np.load(mean_file)
-    net_parameter = caffe_pb2.NetParameter()
-    text_format.Merge(open(model_deploy_file, 'r').read(), net_parameter)
-    print net_parameter
-    print net_parameter.input_dim, imagenet_mean.shape
-    ratio = 227*1.0/imagenet_mean.shape[1]
-    imagenet_mean = scipy.ndimage.zoom(imagenet_mean, (1, ratio, ratio))
+    if mean_file is None:
+        imagenet_mean = np.array([104,117,123])
+    else:
+        imagenet_mean = np.load(mean_file)
+        net_parameter = caffe_pb2.NetParameter()
+        text_format.Merge(open(model_deploy_file, 'r').read(), net_parameter)
+        print net_parameter
+        print net_parameter.input_dim, imagenet_mean.shape
+        ratio = resize_dim*1.0/imagenet_mean.shape[1]
+        imagenet_mean = scipy.ndimage.zoom(imagenet_mean, (1, ratio, ratio))
     
     # INIT NETWORK - NEW CAFFE VERSION
     net = caffe.Net(model_deploy_file, model_params_file, caffe.TEST)

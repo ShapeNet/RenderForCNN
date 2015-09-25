@@ -7,4 +7,12 @@
 *.solverstate
 global_variables.m
 global_variables.py
-data/*
+data/syn_images*
+data/view_*
+data/truncation_*
+data/real_images
+data/tmp*
+datasets/pascal3d
+datasets/shapenetcore
+datasets/sun2012pascalformat
+caffe_models/*.zip

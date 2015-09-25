@@ -26,14 +26,3 @@ if __name__ == '__main__':
     estimated_viewpoints = [[float(x) for x in line.rstrip().split(' ')] for line in open(output_result_file,'r')]
     v = estimated_viewpoints[0]
     print "Estimated view: ", v
-
-    render_demo_folder = os.path.join(g_render4cnn_root_folder, 'render_pipeline', 'demo')
-    aeroplane_model = os.path.join(render_demo_folder, 'sample_model2', 'model.obj')
-    output_image = os.path.join(BASE_DIR, 'view_visualize.png')
-    io_redirect = '' #' > /dev/null 2>&1'
-            
-    python_cmd = 'python %s -m %s -a %s -e %s -t %s -d %s -o %s' % (os.path.join(render_demo_folder, 'render_class_view.py'), 
-        aeroplane_model, str(v[0]), str(v[1]), str(v[2]), str(2.0), output_image)
-    print ">> Running rendering command: \n \t %s" % (python_cmd)
-    os.system('%s %s' % (python_cmd, io_redirect))
-
