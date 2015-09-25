@@ -1,4 +1,4 @@
-function test_det(prediction_folder, ARP, show_curve)
+function test_det(prediction_folder, ARP, show_curve, write_result)
 addpath(fullfile(mfilename('fullpath'), '../../'));
 global_variables;
 
@@ -37,6 +37,8 @@ aps = reshape(aps, 4, numel(aps)/4);
 display(aps(1,:));
 
 
+N = length(g_cls_names);
+aps = aps(1,:);
 if write_result
     if ARP
         result_filename = 'arp_results.txt';
@@ -52,22 +54,22 @@ if write_result
     if ARP
         fprintf('ARP:\n');
         for k = 1:N
-            fprintf(fid, sprintf('%f ', aps(k)));
+            fprintf(fid, sprintf('%f ', aas(k)));
         end
         fprintf(fid, '\n');
         fprintf(fid, '\n');
-        fprintf(fid, 'Mean ARP = %f\n', mean(aps));
+        fprintf(fid, 'Mean ARP = %f\n', mean(aas));
     else
         fprintf('AVP-NV (N=4,8,16,24):\n');
         for j = 1:4
             for k = 1:N
-                fprintf(fid, sprintf('%f ', aps(j,k)));
+                fprintf(fid, sprintf('%f ', aas(j,k)));
             end
             fprintf(fid, '\n');
         end
         fprintf(fid, '\n');
         fprintf('Mean AVP-NV excluding bottles\n');
-        avp_mean = mean(aps(:,[1,2,3,5,6,7,8,9,10,11,12]),2);
+        avp_mean = mean(aas(:,[1,2,3,5,6,7,8,9,10,11,12]),2);
         vs = [4,8,16,24];
         for j = 1:4
             fprintf(fid, 'Mean AVP-%dV = %f\n', vs(j), mean(avp_mean(j)));
@@ -80,10 +82,10 @@ if write_result
     end
     fprintf(fid, '\n');
     for k = 1:N
-        fprintf(fid, sprintf('%f ', aas(k)));
+        fprintf(fid, sprintf('%f ', aps(k)));
     end
     fprintf(fid, '\n\n');
-    fprintf(fid, 'Mean AP = %f\n', mean(aas));
+    fprintf(fid, 'Mean AP = %f\n', mean(aps));
     
     fclose(fid);
 end

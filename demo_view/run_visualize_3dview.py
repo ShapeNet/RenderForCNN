@@ -24,6 +24,7 @@ if __name__ == '__main__':
     print "Estimated view: ", v
 
     render_demo_folder = os.path.join(g_render4cnn_root_folder, 'demo_render')
+    # Change the model.obj file to render images of a diferrent model/category
     aeroplane_model = os.path.join(render_demo_folder, 'sample_model2', 'model.obj')
     output_image = os.path.join(BASE_DIR, 'aeroplane_in_estimated_view.png')
     io_redirect = '' #' > /dev/null 2>&1'
