@@ -142,7 +142,7 @@ To visualize the estimated 3D viewpoint, run and see a rendered image of the vie
 
 The steps are the same as above in Render for CNN Image Synthesis Pipeline.
 
-#### Evaluation of AVP-NV, Acc-\pi/6 and MedErr
+#### Evaluation of AVP-NV, Acc-pi/6 and MedErr
 For AVP-NV (Average Viewpoint Precision), both localization (from R-CNN) and viewpoint estimation (azimuth) are evaluated. For Acc-\pi/6 and MedErr, we evaluate on VOC12 val images without truncations and occlusions. For more details on definition of the metrics, please refer to the paper.
 
 Firstly, we need to prepare the testing images from VOC12, by running:
@@ -153,7 +153,7 @@ Then, do evaluation by running:
 
     python view_estimation/run_evaluation.py
 
-Results are displayed on screen and saved to `view_estimation/avp_test_results/` and `view_estimation/vp_test_results/acc_mederr_results.txt`
+Results are displayed on screen and saved to `view_estimation/avp_test_results/avp_nv_results.txt` and `view_estimation/vp_test_results/acc_mederr_results.txt`
 
 ### Training your Own Models
 to be updated.
