@@ -12,6 +12,8 @@ data/view_*
 data/truncation_*
 data/real_images
 data/tmp*
+data/real_lmdbs
+data/syn_lmdbs
 datasets/pascal3d
 datasets/shapenetcore
 datasets/sun2012pascalformat
