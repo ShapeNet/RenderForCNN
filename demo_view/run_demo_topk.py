@@ -14,10 +14,12 @@ from evaluation_helper import viewpoint_topk
 
 if __name__ == '__main__':
     
-    img_filenames = [os.path.join(BASE_DIR, 'aeroplane_image.jpg')]
-    class_idxs = [g_shape_names.index('aeroplane')]
+    #img_filenames = [os.path.join(BASE_DIR, 'aeroplane_image.jpg')]
+    #class_idxs = [g_shape_names.index('aeroplane')]
+    img_filenames = [os.path.join(BASE_DIR, 'chair_image.jpg')]
+    class_idxs = [g_shape_names.index('chair')]
     output_result_file = os.path.join(BASE_DIR, 'est-view-topk.txt')
-    topk = 5
+    topk = 2
     
     if not os.path.exists(output_result_file):
         viewpoint_topk(img_filenames, class_idxs, topk, output_result_file)

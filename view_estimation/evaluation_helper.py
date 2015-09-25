@@ -88,15 +88,16 @@ def get_top_preds(prob, num_bin=8, diff_threshold=10):
 
         # verify
         duplicate = 0
-        for pred, _ in preds_list:
-            if min(abs(local_pred - pred), N - abs(local_pred - pred)) < diff_threshold:
+        for i, ituple in enumerate(preds_list):
+            ipred, iprob = ituple
+            if min(abs(local_pred - ipred), N - abs(local_pred - ipred)) < diff_threshold:
+                if local_prob > iprob:
+                    preds_list[i] = (local_pred, local_prob) # exchange to bigger one
                 duplicate = 1 # too close to existed pred
                 break
         if duplicate == 0:
             preds_list.append((local_pred, local_prob))
-    print 'before sorted, preds_list:\n', preds_list
     preds_list = sorted(preds_list, key=lambda item:item[1], reverse=True)
-    print 'after sorted, preds_list:\n', preds_list
     return preds_list
 
 
@@ -106,16 +107,14 @@ def get_top_preds(prob, num_bin=8, diff_threshold=10):
     get topk confident viewpoint predictions from probs
 @input:
     probs_3dview - a length-3 list of azimuth, elevation and tilt probs (each is length-360 list)
-    topk (K) - integer (1000=>K>=1). only return top K confident result
+    topk (K) - integer (K>=1). only return top K confident result
 @output:
     return topk_viewpoints - a length-topk list of tuples of (<viewpoint-tuple>, <confidence>), where
     <viewpoint-tuple> is a length-3 tuples of azimuth, elevation and tilt angles in degree
 '''
 def get_topk_viewpoints(probs_3dview, topk):
-    assert(topk>=1 and topk<=1000)
-    print 'topk:\n', topk
-    for n in range(10):
-        if n*n*n >= topk: break
+    assert(topk>=1)
+    viewpoints_list = []
 
     # secure softmax. used to normalize an array to 0~1 with sum as 1
     def my_softmax(x):
@@ -123,27 +122,30 @@ def get_topk_viewpoints(probs_3dview, topk):
         out = ex / ex.sum()
         return out
 
-    print 'n:\n', n
-    print 'returned by get_top_preds:\n', get_top_preds(probs_3dview[0], 16, 10)
-    preds_list_azimuth = get_top_preds(probs_3dview[0], 16, 10)[0:n]
-    print 'prob azimuth:\n', probs_3dview[0]
-    print 'preds_list_azimuth:\n', preds_list_azimuth
-    preds_list_elevation = get_top_preds(probs_3dview[1], 36, 8)[0:n]
-    preds_list_tilt = get_top_preds(probs_3dview[2], 72, 3)[0:n]
+    # Rank by prob-azimuth * prob-elevation * prob-tilt
+    #for n in range(10):
+    #    if n*n*n >= topk: break
+    #probs_3dview = [my_softmax(prob) for prob in probs_3dview]
+    #preds_list_azimuth = get_top_preds(probs_3dview[0], 16, 45)[0:n]
+    #preds_list_elevation = get_top_preds(probs_3dview[1], 24, 10)[0:n]
+    #preds_list_tilt = get_top_preds(probs_3dview[2], 36, 5)[0:n]
+    #for i in range(n):
+    #    for j in range(n):
+    #        for k in range(n):
+    #            apred,aprob = preds_list_azimuth[i]
+    #            epred,eprob = preds_list_elevation[j]
+    #            tpred,tprob = preds_list_tilt[k]
+    #            viewpoints_list.append(((apred,epred,tpred), np.log(aprob)+np.log(eprob)+np.log(tprob)))
+    
+    # Rank by azimuth and a bit of elevation
+    preds_list_azimuth = get_top_preds(probs_3dview[0], 16, 45)
+    for i in range(min(topk,len(preds_list_azimuth))):
+        apred,aprob = preds_list_azimuth[i]
+        viewpoints_list.append(((apred, probs_3dview[1].argmax(), probs_3dview[2].argmax()), aprob))
+        
 
-    viewpoints_list = []
-    for i in range(n):
-        for j in range(n):
-            for k in range(n):
-                apred,aprob = preds_list_azimuth[i]
-                epred,eprob = preds_list_elevation[j]
-                tpred,tprob = preds_list_tilt[k]
-                viewpoints_list.append(((apred,epred,tpred),np.log(aprob)+np.log(eprob)+np.log(tprob)))
-
-    print 'viewpoints_list before sorted:\n', viewpoints_list
     viewpoints_list = sorted(viewpoints_list, key=lambda item:item[1], reverse=True)
     topk_viewpoints = viewpoints_list[0:topk]
-    print 'viewpoints_list after sorted:\n', viewpoints_list
 
     return topk_viewpoints
     
@@ -155,7 +157,7 @@ def get_topk_viewpoints(probs_3dview, topk):
 @input:
     img_filenames - list of image filenames
     class_idxs - list of class index (0~11)
-    topk (K) - integer number (1000=>K>=1). choose top K prediction results (in default, set to 1)
+    topk (K) - integer number (10=>K>=1). choose top K prediction results (in default, set to 1)
     output_result_file - string. output estimated viewpoints into this file
 @output:
     return preds - a lenght-len(img_filenames) list of length-topk list of tuples 
@@ -179,7 +181,7 @@ def viewpoint_topk(img_filenames, class_idxs, topk=1, output_result_file=None):
     result_keys = g_caffe_prob_keys
     resize_dim = g_images_resize_dim
     image_mean_file = g_image_mean_file
-    assert(topk>=1 and topk<=1000) # from 1^3 to 10^3
+    assert(topk>=1 and topk<=10) # from 1^3 to 10^3
     assert(len(result_keys) == 3) #azimuth,elevation,tilt
     
     # ** NETWORK FORWARD PASS **
@@ -203,7 +205,6 @@ def viewpoint_topk(img_filenames, class_idxs, topk=1, output_result_file=None):
        
         # get topk viewpoints: length-topk list of lenght-3 tuples
         topk_viewpoints = get_topk_viewpoints(probs_3dview, topk)
-        print 'topk_viewpoints in viewpoint_topk func:\n', topk_viewpoints
         preds[i] = topk_viewpoints
     
     if output_result_file is not None:
@@ -211,7 +212,7 @@ def viewpoint_topk(img_filenames, class_idxs, topk=1, output_result_file=None):
         fout = open(output_result_file, 'w')
         for i in range(len(img_filenames)):
             topk_views = preds[i] 
-            for k in range(topk):
+            for k in range(len(topk_views)):
                 va,ve,vt = topk_views[k][0]
                 confidence = topk_views[k][1]
                 fout.write('%d %d %d %f ' % (va,ve,vt,confidence))
