@@ -181,17 +181,17 @@ for param in view_params:
     # set environment lighting
     #bpy.context.space_data.context = 'WORLD'
     bpy.context.scene.world.light_settings.use_environment_light = True
-    bpy.context.scene.world.light_settings.environment_energy = np.random.uniform(0, 1)
+    bpy.context.scene.world.light_settings.environment_energy = np.random.uniform(g_syn_light_environment_energy_lowbound, g_syn_light_environment_energy_highbound)
     bpy.context.scene.world.light_settings.environment_color = 'PLAIN'
 
     # set point lights
     for i in range(random.randint(light_num_lowbound,light_num_highbound)):
-        light_azimuth_deg = np.random.uniform(0, 360)
-        light_elevation_deg  = np.random.uniform(-90, 90)
+        light_azimuth_deg = np.random.uniform(g_syn_light_azimuth_degree_lowbound, g_syn_light_azimuth_degree_highbound)
+        light_elevation_deg  = np.random.uniform(g_syn_light_elevation_degree_lowbound, g_syn_light_elevation_degree_highbound)
         light_dist = np.random.uniform(light_dist_lowbound, light_dist_highbound)
         lx, ly, lz = obj_centened_camera_pos(light_dist, light_azimuth_deg, light_elevation_deg)
         bpy.ops.object.lamp_add(type='POINT', view_align = False, location=(lx, ly, lz))
-        bpy.data.objects['Point'].data.energy = np.random.normal(2, 2)
+        bpy.data.objects['Point'].data.energy = np.random.normal(g_syn_light_energy_mean, g_syn_light_energy_std)
 
     cx, cy, cz = obj_centened_camera_pos(rho, azimuth_deg, elevation_deg)
     q1 = camPosToQuaternion(cx, cy, cz)
