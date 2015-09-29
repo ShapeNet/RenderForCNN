@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>RenderForCNN by ShapeNet</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>RenderForCNN</h1>
+        <h2>Render for CNN: Viewpoint Estimation in Images Using CNNs Trained with Rendered 3D Model Views</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/ShapeNet/RenderForCNN/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/ShapeNet/RenderForCNN/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/ShapeNet/RenderForCNN" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>Created by <a href="http://ai.stanford.edu/~haosu/" target="_blank">Hao Su</a>, <a href="http://web.stanford.edu/~rqi/" target="_blank">Charles R. Qi</a>, <a href="http://web.stanford.edu/~yangyan/" target="_blank">Yangyan Li</a>, <a href="http://geometry.stanford.edu/member/guibas/" target="_blank">Leonidas J. Guibas</a> from Stanford University.</p>
+
+<h3>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h3>
+
+<p>Our work was initially described in an <a href="http://arxiv.org/abs/1505.05641">arXiv tech report</a> and will appear as an ICCV 2015 paper. Render for CNN is a scalable image synthesis pipeline for generating millions of training images for high-capacity models such as deep CNNs. We demonstrated how to use this pipeline, together with specially designed network architecture, to train CNNs to learn viewpoints of objects from millions of synthetic images and real images. In this repository, we provide both the rendering pipeline codes and off-the-shelf viewpoint estimator for PASCAL3D+ objects.</p>
+
+<h3>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h3>
+
+<p>Render for CNN is released under the MIT License (refer to the LICENSE file for details).</p>
+
+<h3>
+<a id="citing-render-for-cnn" class="anchor" href="#citing-render-for-cnn" aria-hidden="true"><span class="octicon octicon-link"></span></a>Citing Render for CNN</h3>
+
+<p>If you find Render for CNN useful in your research, please consider citing:</p>
+
+<pre><code>@InProceedings{Su_2015_ICCV,
+    Title={Render for CNN: Viewpoint Estimation in Images Using CNNs Trained with Rendered 3D Model Views},
+    Author={Su, Hao and Qi, Charles R. and Li, Yangyan and Guibas, Leonidas J.},
+    Booktitle={The IEEE International Conference on Computer Vision (ICCV)},
+    month = {December},
+    Year= {2015}
+}
+</code></pre>
+
+<h3>
+<a id="contents" class="anchor" href="#contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contents</h3>
+
+<ol>
+<li><a href="#render-for-cnn-image-synthesis-pipeline">Render for CNN Image Synthesis Pipeline</a></li>
+<li><a href="#off-the-shelf-viewpoint-estimator">Off-the-shelf Viewpoint Estimator</a></li>
+<li><a href="#testing-on-voc12-val">Testing on VOC12 val</a></li>
+<li><a href="#training-your-own-models">Training your Own Models</a></li>
+</ol>
+
+<h3>
+<a id="render-for-cnn-image-synthesis-pipeline" class="anchor" href="#render-for-cnn-image-synthesis-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Render for CNN Image Synthesis Pipeline</h3>
+
+<p><strong>Prerequisites</strong></p>
+
+<ol>
+<li><p>Blender (tested with Blender 2.71 on 64-bit Linux). You can get it from <a href="http://www.blender.org/features/past-releases/2-71/" target="_blank">Blender website</a> for free.</p></li>
+<li><p>MATLAB (tested with 2014b on 64-bit Linux). You also need to compile the external kde package in <code>render_pipeline/kde/matlab_kde_package</code> by following the <code>README.txt</code> file in that folder.</p></li>
+<li>
+<p>Datasets (ShapeNet, PASCAL3D+, SUN2012) [<strong>not required for the demo</strong>]. If you already have the same datasets (as in urls specified in the shell scripts) downloaded, you can build soft links to the datasets with the same pathname as specified in the shell scripts. Otherwise, just do the following steps under project root folder:</p>
+
+<pre>
+bash dataset/get_shapenet.sh
+bash dataset/get_sun2012pascalformat.sh
+bash dataset/get_pascal3d.sh
+</pre>
+</li>
+</ol>
+
+<p><strong>Set up paths</strong></p>
+
+<p>All data and code paths should be set in <code>global_variables.py</code>. We have provided you an example version <code>global_variables.py.example</code>. You only need to copy or rename the example file and <strong>modify the Blender and MATLAB path</strong> in it (in default the paths are set to <code>blend</code> and <code>matlab</code>). All other paths are relative to the project root folder and should be fine.</p>
+
+<pre><code>cp global_variables.py.example global_variables.py
+</code></pre>
+
+<p>After setting Blender and MATLAB paths in <code>global_variables.py</code>, run script to set up MATLAB global variable file.</p>
+
+<pre><code>python setup.py
+</code></pre>
+
+<h4>
+<a id="demo-of-synthesis-pipeline" class="anchor" href="#demo-of-synthesis-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demo of synthesis pipeline</h4>
+
+<p>This small demo at <code>demo_render</code> shows how we get cropped, background overlaid images of objects from a 3D model. It also helps verity that you have all enviroment set up. To run the demo, cd into project root folder and follow steps below.</p>
+
+<pre><code>cd demo_render
+python run_demo.py
+</code></pre>
+
+<h4>
+<a id="running-large-scale-synthesis" class="anchor" href="#running-large-scale-synthesis" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running large scale synthesis</h4>
+
+<ol>
+<li>
+<p><strong>Estimate viewpoint and truncation distributions</strong> with KDE (kernal density estimation). If you haven't compiled the kde package, go to <code>render_pipeline/kde/matlab_kde_package/mex</code>, open MATLAB and run <code>makemex</code> in MATLAB to generate mex files.</p>
+
+<pre>
+cd render_pipeline/kde
+</pre>
+
+<p>Open MATLAB and run the following command (expect to see plots popping up). Viewpoint and truncation statistics will be saved to <code>data/view_statistics</code> and <code>data/truncation_statistics</code>. Samples generated from estimated distrubtion will be saved to <code>data/view_distribution</code> and <code>truncation_distribution</code>.</p>
+
+<pre>
+run_sampling;
+</pre>
+</li>
+<li>
+<p><strong>Render images with Blender</strong> This step is computationally heavy and may take a long time depending how powerful your computers are. It takes us around 8 hours to render 2.4M images on 6 multi-core servers. If you have multiple servers with shared filesystem, you can set <code>g_hostname_synset_idx_map</code> in <code>global_variables.py</code> accordingly. Note that currently models are directly from ShapeNet, deformed models will be released separately later. </p>
+
+<pre>
+python render_pipeline/run_render.py
+</pre>
+
+<p>You can stop rendering at any time and execute following commands to crop and overlay background on images that have already been rendered. In default, rendered images will be saved at <code>data/syn_images</code>.</p>
+</li>
+<li>
+<p><strong>Crop images</strong> This step is IO heavy and it takes around 1~2 hours on a multi-core server. SSD or high-end HDD disk could help a lot. In default, cropped images are saved to <code>data/syn_images_cropped</code>.</p>
+
+<pre>
+python render_pipeline/run_crop.py
+</pre>
+</li>
+<li>
+<p><strong>Overlay backgrounds</strong> Time consumption is similar to cropping step above. In default, background overlaid (also cropped from step above) images are saved to <code>data/syn_images_cropped_bkg_overlaid</code>.</p>
+
+<pre>
+python render_pipeline/run_overlay.py
+</pre>
+
+<p>If you'd like to get a file containing all synthesized image filenames and their labels (class, azimuth, elevation, tilt angles), we have some helper functions for that - just go look at <code>get_one_category_image_label_file</code> and <code>combine_files</code> in <code>view_estimation/data_prep_helper.py</code>, also refer to <code>view_estimation/prepare_training_data.py</code> for usage examples.</p>
+</li>
+</ol>
+
+<h3>
+<a id="off-the-shelf-viewpoint-estimator" class="anchor" href="#off-the-shelf-viewpoint-estimator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Off-the-shelf Viewpoint Estimator</h3>
+
+<p><strong>Prerequisites</strong></p>
+
+<ol>
+<li><p><a href="https://github.com/BVLC/caffe" target="_blank">Caffe</a> (with pycaffe compiled). For testing we support the new caffe interface and prototxt files (which uses "layer" instead of "layers" in prototxt file). You can follow <a href="http://caffe.berkeleyvision.org/installation.html" target="_blank">this webpage</a> for installation details.</p></li>
+<li>
+<p>Download our pre-trained caffe model (~390MB). The model was trained on rendered images and VOC12 train set real images.</p>
+
+<pre>
+cd caffe_models
+sh fetch_model.sh
+</pre>
+</li>
+</ol>
+
+<p><strong>Set up paths</strong></p>
+
+<p>The steps are the same as above in Render for CNN Image Synthesis Pipeline.</p>
+
+<h4>
+<a id="demo-of-3d-viewpoint-estimator" class="anchor" href="#demo-of-3d-viewpoint-estimator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demo of 3D viewpoint estimator</h4>
+
+<p>This demo at <code>demo_view</code> shows how one can use our off-the-shelf viewpoint estimator. To estimate viewpoint of an example image of airplane, do the following.</p>
+
+<pre><code>cd demo_view
+python run_demo.py
+</code></pre>
+
+<p>To visualize the estimated 3D viewpoint, run and see a rendered image of the viewpoint.</p>
+
+<pre><code>python run_visualize_3dview.py
+</code></pre>
+
+<h3>
+<a id="testing-on-voc12-val" class="anchor" href="#testing-on-voc12-val" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing on VOC12 val</h3>
+
+<p><strong>Prerequisites</strong></p>
+
+<ol>
+<li><p>Caffe with python interface and pretrained caffe mdoel - as in requirement in <a href="#off-the-shelf-viewpoint-estimator">Off-the-shelf Viewpoint Estimator</a>.</p></li>
+<li>
+<p>PASCAL3D+ dataset - if you haven't downloaded it. It will be used for preparing test images and evaluation.</p>
+
+<pre>
+bash dataset/get_pascal3d.sh
+</pre>
+</li>
+<li><p>MATLAB for preparing test images.</p></li>
+</ol>
+
+<p><strong>Set up paths</strong></p>
+
+<p>The steps are the same as above in Render for CNN Image Synthesis Pipeline.</p>
+
+<h4>
+<a id="evaluation-of-avp-nv-acc-pi6-and-mederr" class="anchor" href="#evaluation-of-avp-nv-acc-pi6-and-mederr" aria-hidden="true"><span class="octicon octicon-link"></span></a>Evaluation of AVP-NV, Acc-pi/6 and MedErr</h4>
+
+<p>For AVP-NV (Average Viewpoint Precision), both localization (from R-CNN) and viewpoint estimation (azimuth) are evaluated. For Acc-\pi/6 and MedErr, we evaluate on VOC12 val images without truncations and occlusions. For more details on definition of the metrics, please refer to the paper.</p>
+
+<p>Firstly, we need to prepare the testing images from VOC12, by running:</p>
+
+<pre><code>python view_estimation/prepare_testing_data.py
+</code></pre>
+
+<p>Then, do evaluation by running:</p>
+
+<pre><code>python view_estimation/run_evaluation.py
+</code></pre>
+
+<p>Results are displayed on screen and saved to <code>view_estimation/avp_test_results/avp_nv_results.txt</code> and <code>view_estimation/vp_test_results/acc_mederr_results.txt</code></p>
+
+<h3>
+<a id="training-your-own-models" class="anchor" href="#training-your-own-models" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training your Own Models</h3>
+
+<p>to be updated.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
