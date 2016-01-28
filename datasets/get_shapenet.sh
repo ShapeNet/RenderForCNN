@@ -3,6 +3,7 @@
 
 # do not change this name
 dataset_dir="shapenetcore"
+zip_file="ShapeNetCore.v1.zip"
 
 # if you have already had the same version of dataset, you can 
 # create soft link like this:
@@ -11,9 +12,12 @@ dataset_dir="shapenetcore"
 DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 cd $DIR
 
-echo "Downloading..."
-
-wget http://shapenet.cs.stanford.edu/shapenet/obj-zip/ShapeNetCore.v1.zip
+if [ -f $zip_file ];
+then
+  echo "Good. you already have the zip file downloaded."
+else
+  echo "Please visit http://shapenet.cs.stanford.edu to request ShapeNet data and then put the zip file in this folder and then run this script again.."
+fi
 
 echo "Unzipping..."
 
