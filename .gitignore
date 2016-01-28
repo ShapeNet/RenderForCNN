@@ -18,3 +18,5 @@ datasets/pascal3d
 datasets/shapenetcore
 datasets/sun2012pascalformat
 caffe_models/*.zip
+*deformed*
+experiments
