@@ -156,4 +156,10 @@ Then, do evaluation by running:
 Results are displayed on screen and saved to `view_estimation/avp_test_results/avp_nv_results.txt` and `view_estimation/vp_test_results/acc_mederr_results.txt`
 
 ### Training your Own Models
-to be updated.
+For Caffe, go to <a href='https://github.com/charlesq34/caffe-render-for-cnn' target='_blank'>caffe-render-for-cnn</a> for the version with special loss layers.
+
+To prepare training data, run the script below. This will genereate LMDB in the data folder.
+
+    python view_estimation/prepare_training_data.py
+
+To do the training, modify prototxt files in the `train` folder.
