@@ -171,7 +171,7 @@ bpy.ops.object.delete()
 for param in view_params:
     azimuth_deg = param[0]
     elevation_deg = param[1]
-    theta_deg = -1 * param[2] # ** multiply by -1 to match pascal3d annotations **
+    theta_deg = param[2]
     rho = param[3]
 
     # clear default lights
@@ -205,6 +205,8 @@ for param in view_params:
     camObj.rotation_quaternion[1] = q[1]
     camObj.rotation_quaternion[2] = q[2]
     camObj.rotation_quaternion[3] = q[3]
+    # ** multiply tilt by -1 to match pascal3d annotations **
+    theta_deg = (-1*theta_deg)%360
     syn_image_file = './%s_%s_a%03d_e%03d_t%03d_d%03d.png' % (shape_synset, shape_md5, round(azimuth_deg), round(elevation_deg), round(theta_deg), round(rho))
     bpy.data.scenes['Scene'].render.filepath = os.path.join(syn_images_folder, syn_image_file)
     bpy.ops.render.render( write_still=True )
