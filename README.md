@@ -161,5 +161,18 @@ For Caffe, go to <a href='https://github.com/charlesq34/caffe-render-for-cnn' ta
 To prepare training data, run the script below. This will genereate LMDB in the data folder.
 
     python view_estimation/prepare_training_data.py
-
+   
 To do the training, modify prototxt files in the `train` folder.
+
+You can directly download synthetic images rendered by us at https://shapenet.cs.stanford.edu/media/syn_images_cropped_bkg_overlaid.tar
+
+We name images in this package by their viewpoints. An example is the following: 
+
+<synset_id>_<model_md5>_a010_e007_t016_d002.png
+
+where azimuth angle is 10 degree, elevation angle is 7 degree. 
+
+NOTE: The tilt angle should be flipped as to what is written in the filename. Here the tilt angle should be -16 (344) degree to make it consistent with PASCAL3D annotation.
+
+
+
