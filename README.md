@@ -168,7 +168,7 @@ You can directly download synthetic images rendered by us at https://shapenet.cs
 
 We name images in this package by their viewpoints. An example is the following: 
 
-<synset_id>_<model_md5>_a010_e007_t016_d002.png
+synsetid_modelmd5_a010_e007_t016_d002.png
 
 where azimuth angle is 10 degree, elevation angle is 7 degree. 
 
