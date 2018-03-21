@@ -39,9 +39,9 @@ If you find Render for CNN useful in your research, please consider citing:
 2. Datasets (ShapeNet, PASCAL3D+, SUN2012) [**not required for the demo**]. If you already have the same datasets (as in urls specified in the shell scripts) downloaded, you can build soft links to the datasets with the same pathname as specified in the shell scripts. Otherwise, just do the following steps under project root folder:
 	
     <pre>
-    bash dataset/get_shapenet.sh
-    bash dataset/get_sun2012pascalformat.sh
-    bash dataset/get_pascal3d.sh
+    bash datasets/get_shapenet.sh
+    bash datasets/get_sun2012pascalformat.sh
+    bash datasets/get_pascal3d.sh
     </pre>
     
 **Set up paths**
